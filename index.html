@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Find your next car at Premier Motorworks. Browse a hand-picked collection of premium new and pre-owned vehicles."
+    />
+    <title>Premier Motorworks | Find your next drive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Premier Motorworks home">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span class="brand-copy">
+          <strong>PREMIER</strong>
+          <small>MOTORWORKS</small>
+        </span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="active" href="#home">Home</a>
+        <a href="#inventory">Inventory</a>
+        <a href="#why-us">Finance</a>
+        <a href="#why-us">Services</a>
+        <a href="#about">About us</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="phone-link" href="tel:+12125550148"><span aria-hidden="true">☎</span> (212) 555-0148</a>
+        <a class="button button-red header-cta" href="#contact">Book a test drive <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-image" role="img" aria-label="Black luxury sedan parked outside a modern showroom"></div>
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <p class="eyebrow"><span></span> Your next chapter starts here</p>
+          <h1>Drive your<br /><em>dream</em> car.</h1>
+          <p class="hero-description">
+            A better kind of car buying. Explore a hand-picked collection of exceptional vehicles and find the one that feels like you.
+          </p>
+          <div class="hero-buttons">
+            <a class="button button-red" href="#inventory">Explore inventory <span aria-hidden="true">↗</span></a>
+            <a class="button button-outline" href="#contact">Book a test drive <span aria-hidden="true">▷</span></a>
+          </div>
+          <div class="hero-note"><span class="note-stars">★★★★★</span> <strong>4.9/5</strong> from 1,200+ happy drivers</div>
+        </div>
+        <div class="hero-index"><span>01</span> / 03</div>
+      </section>
+
+      <section class="search-panel" aria-label="Find a vehicle">
+        <div class="search-tabs" role="tablist" aria-label="Vehicle condition">
+          <button class="search-tab selected" type="button" data-condition="all">All vehicles</button>
+          <button class="search-tab" type="button" data-condition="new">✦ New cars</button>
+          <button class="search-tab" type="button" data-condition="used">Used cars</button>
+        </div>
+        <form class="vehicle-search" id="vehicle-search">
+          <label>
+            <span>Make</span>
+            <select id="make-filter">
+              <option value="">All makes</option>
+              <option>BMW</option>
+              <option>Mercedes-Benz</option>
+              <option>Audi</option>
+              <option>Porsche</option>
+              <option>Lexus</option>
+            </select>
+          </label>
+          <label>
+            <span>Model</span>
+            <select id="model-filter">
+              <option value="">Any model</option>
+              <option>3 Series</option>
+              <option>C-Class</option>
+              <option>Q5</option>
+              <option>911</option>
+              <option>RX 350</option>
+            </select>
+          </label>
+          <label>
+            <span>Year</span>
+            <select id="year-filter">
+              <option value="">Any year</option>
+              <option>2025</option>
+              <option>2024</option>
+              <option>2023</option>
+            </select>
+          </label>
+          <label>
+            <span>Price range</span>
+            <select id="price-filter">
+              <option value="">Any price</option>
+              <option value="50000">Under $50,000</option>
+              <option value="75000">Under $75,000</option>
+              <option value="100000">Under $100,000</option>
+            </select>
+          </label>
+          <button class="button button-red search-submit" type="submit"><span aria-hidden="true">⌕</span> Find a car</button>
+        </form>
+        <div class="trust-row" id="why-us">
+          <div><span class="trust-icon">✦</span><p><strong>200+</strong><small>Premium vehicles</small></p></div>
+          <div><span class="trust-icon">◇</span><p><strong>100%</strong><small>Quality guaranteed</small></p></div>
+          <div><span class="trust-icon">◷</span><p><strong>24/7</strong><small>Here when you need us</small></p></div>
+          <div><span class="trust-icon">♧</span><p><strong>Easy finance</strong><small>Options made for you</small></p></div>
+        </div>
+      </section>
+
+      <section class="brands-section" aria-label="Browse by brand">
+        <p class="section-kicker">The names you know. The quality you deserve.</p>
+        <div class="brand-list">
+          <a href="#inventory"><span class="brand-symbol">◉</span><span>BMW</span></a>
+          <a href="#inventory"><span class="brand-symbol">◈</span><span>Mercedes-Benz</span></a>
+          <a href="#inventory"><span class="brand-symbol audi-rings">○○○</span><span>Audi</span></a>
+          <a href="#inventory"><span class="brand-symbol">⊙</span><span>LEXUS</span></a>
+          <a href="#inventory"><span class="brand-symbol">⌖</span><span>PORSCHE</span></a>
+          <a href="#inventory"><span class="brand-symbol">◇</span><span>Land Rover</span></a>
+        </div>
+      </section>
+
+      <section class="inventory-section" id="inventory">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow dark-eyebrow"><span></span> Hand-picked for you</p>
+            <h2>Find your <em>kind</em> of drive.</h2>
+          </div>
+          <a class="text-link" href="#inventory">View all inventory <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="inventory-grid" id="inventory-grid">
+          <article class="car-card" data-make="BMW" data-model="3 Series" data-year="2024" data-price="58900" data-condition="used">
+            <a class="car-image" href="#contact" aria-label="View 2024 BMW 330i details">
+              <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=85" alt="Blue BMW sedan" />
+              <span class="car-tag">JUST ARRIVED</span><button class="favorite" type="button" aria-label="Save BMW 330i">♡</button>
+            </a>
+            <div class="car-info">
+              <p class="car-year">2024 <span>·</span> PRE-OWNED</p>
+              <h3>BMW 330i M Sport</h3>
+              <p class="car-specs">12,400 mi <span>·</span> Automatic <span>·</span> 2.0L Turbo</p>
+              <div class="car-bottom"><strong>$58,900</strong><a href="#contact" aria-label="View BMW 330i">↗</a></div>
+            </div>
+          </article>
+          <article class="car-card" data-make="Mercedes-Benz" data-model="C-Class" data-year="2025" data-price="64900" data-condition="new">
+            <a class="car-image" href="#contact" aria-label="View 2025 Mercedes-Benz C-Class details">
+              <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=900&q=85" alt="Black Mercedes-Benz sedan" />
+              <span class="car-tag">NEW ARRIVAL</span><button class="favorite" type="button" aria-label="Save Mercedes-Benz C-Class">♡</button>
+            </a>
+            <div class="car-info">
+              <p class="car-year">2025 <span>·</span> NEW</p>
+              <h3>Mercedes-Benz C 300</h3>
+              <p class="car-specs">New <span>·</span> Automatic <span>·</span> 2.0L Turbo</p>
+              <div class="car-bottom"><strong>$64,900</strong><a href="#contact" aria-label="View Mercedes-Benz C-Class">↗</a></div>
+            </div>
+          </article>
+          <article class="car-card" data-make="Audi" data-model="Q5" data-year="2024" data-price="52750" data-condition="used">
+            <a class="car-image" href="#contact" aria-label="View 2024 Audi Q5 details">
+              <img src="https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=900&q=85" alt="Grey Audi SUV" />
+              <span class="car-tag">CERTIFIED</span><button class="favorite" type="button" aria-label="Save Audi Q5">♡</button>
+            </a>
+            <div class="car-info">
+              <p class="car-year">2024 <span>·</span> CERTIFIED</p>
+              <h3>Audi Q5 Premium Plus</h3>
+              <p class="car-specs">8,200 mi <span>·</span> Automatic <span>·</span> Quattro AWD</p>
+              <div class="car-bottom"><strong>$52,750</strong><a href="#contact" aria-label="View Audi Q5">↗</a></div>
+            </div>
+          </article>
+        </div>
+        <p class="no-results" id="no-results" hidden>No vehicles match those filters. Try changing your search.</p>
+      </section>
+
+      <section class="contact-banner" id="about">
+        <div><p class="eyebrow"><span></span> The Premier difference</p><h2>More than a car.<br />A better way to <em>drive.</em></h2></div>
+        <p>Good cars deserve a great experience. Our team is here to make every step feel easy, from your first browse to the first mile.</p>
+        <a class="button button-red" href="#contact">Meet our team <span aria-hidden="true">↗</span></a>
+      </section>
+    </main>
+
+    <footer id="contact">
+      <a class="brand footer-brand" href="#home">
+        <span class="brand-mark" aria-hidden="true">P</span><span class="brand-copy"><strong>PREMIER</strong><small>MOTORWORKS</small></span>
+      </a>
+      <p>Exceptional cars. Extraordinary care.</p>
+      <div class="footer-contact"><a href="tel:+12125550148">(212) 555-0148</a><a href="mailto:hello@premiermotorworks.com">hello@premiermotorworks.com</a></div>
+      <small class="copyright">© 2025 Premier Motorworks. All rights reserved.</small>
+    </footer>
+  </body>
+</html>
