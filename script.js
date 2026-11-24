@@ -87,7 +87,7 @@
   function sendEnquiry(car,form){
     let name="",phone="",message="";
     if(form){const data=new FormData(form);name=String(data.get("name")||"").trim();phone=String(data.get("phone")||"").trim();message=String(data.get("message")||"").trim();}
-    const body=[`Hello Premier Motorworks, I'm interested in the ${car.year} ${car.name} (${money(car.price)}).`,name?`Name: ${name}`:"",phone?`Phone: ${phone}`:"",message?`Message: ${message}`:"Please share availability and viewing details."].filter(Boolean).join("\\n");
+    const body=[`Hello ${siteSettings.business_name||"Premier Motorworks"}, I'm interested in the ${car.year} ${car.name} (${money(car.price,car.currency)}).`,name?`Name: ${name}`:"",phone?`Phone: ${phone}`:"",message?`Message: ${message}`:"Please share availability and viewing details."].filter(Boolean).join("\\n");
     const number=String(siteSettings.whatsapp_number||"").replace(/[^0-9]/g,"");
     const url=number?"https://wa.me/"+number+"?text="+encodeURIComponent(body):"https://wa.me/?text="+encodeURIComponent(body);
     window.open(url,"_blank","noopener,noreferrer");
