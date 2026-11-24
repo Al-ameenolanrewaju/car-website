@@ -90,9 +90,16 @@ class VehicleImage(db.Model):
     def url(self):
         return "/media/" + str(self.id)
 
+enquiry_vehicles = db.Table(
+    "enquiry_vehicles",
+    db.Column("enquiry_id", db.Integer, db.ForeignKey("enquiry.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("vehicle_id", db.Integer, db.ForeignKey("vehicle.id", ondelete="CASCADE"), primary_key=True),
+)
+
 class Enquiry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vehicle_id = db.Column(db.Integer, db.ForeignKey("vehicle.id", ondelete="SET NULL"), index=True)
+    selected_vehicles = db.relationship("Vehicle", secondary=enquiry_vehicles, lazy="select")
     customer_name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(40), nullable=False)
