@@ -56,10 +56,12 @@ def dashboard():
         "sold": Vehicle.query.filter_by(status="sold").count(),
         "enquiries": Enquiry.query.count(),
         "new_enquiries": Enquiry.query.filter_by(status="new").count(),
+        "team": AdminUser.query.count(),
     }
     recent = Enquiry.query.order_by(Enquiry.created_at.desc()).limit(6).all()
     latest = Vehicle.query.order_by(Vehicle.created_at.desc()).limit(5).all()
-    return render_template("admin/dashboard.html", stats=stats, recent=recent, latest=latest)
+    activity = AuditLog.query.order_by(AuditLog.created_at.desc()).limit(8).all()
+    return render_template("admin/dashboard.html", stats=stats, recent=recent, latest=latest, activity=activity)
 
 @admin_bp.get("/vehicles")
 @admin_required
