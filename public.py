@@ -12,6 +12,8 @@ def vehicles():
     status = request.args.get("status", "available")
     if status in {"available", "reserved", "sold"}:
         query = query.filter_by(status=status)
+    elif status != "all":
+        query = query.filter_by(status="available")
     if request.args.get("make"):
         query = query.filter(Vehicle.make.ilike("%" + request.args["make"][:80] + "%"))
     if request.args.get("q"):
@@ -57,3 +59,10 @@ def create_enquiry():
     db.session.add(enquiry)
     db.session.commit()
     return jsonify({"ok": True, "message": "Your enquiry has been received. Our team will be in touch."}), 201
+
+
+@public_bp.get("/api/site-settings")
+def public_site_settings():
+    from models import SiteSetting
+    values = {item.key: item.value for item in SiteSetting.query.filter(SiteSetting.key.in_(["business_name", "whatsapp_number", "currency"])).all()}
+    return jsonify({"business_name": values.get("business_name", "Premier Motorworks"), "whatsapp_number": values.get("whatsapp_number", ""), "currency": values.get("currency", "NGN")})
