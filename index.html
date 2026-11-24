@@ -13,25 +13,14 @@
   <script src="/static/script.js" defer></script>
 </head>
 <body id="top" class="marketplace-page">
-  <div class="announcement-bar">A more considered way to find your next car <span>—</span> Discover the collection</div>
-  <header class="site-header">
-    <a class="brand" href="index.html" aria-label="Premier Motorworks home">
-      <span class="brand-mark" aria-hidden="true">P</span>
-      <span class="brand-copy"><strong>PREMIER</strong><small>MOTORWORKS</small></span>
-    </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><span></span><span></span></button>
-    <nav class="main-nav" id="main-nav" aria-label="Main navigation">
-      <a class="active" href="index.html" aria-current="page">Home</a>
-      <a href="#inventory">Collection</a>
-      <a href="#brands">Brands</a>
-      <a href="#about">Our approach</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <div class="header-actions">
-      <a class="saved-link" href="saved-cars.html" aria-label="View saved cars"><span aria-hidden="true">♡</span><span>Saved</span><b data-saved-count>0</b></a>
-      <a class="header-cta" href="#inventory">Explore cars <span aria-hidden="true">↗</span></a>
-    </div>
-  </header>
+  <header class="site-header sule-style-header">
+  <a class="brand sule-brand" href="/" aria-label="Premier Motorworks home"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-copy"><strong>PREMIER</strong><small>MOTORWORKS</small></span></a>
+  <nav class="main-nav" id="main-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/collection">Collection</a></nav>
+  <div class="header-actions sule-header-actions">
+    <a class="saved-icon-link" href="/saved-cars.html" aria-label="Saved cars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg><b data-saved-count>0</b></a>
+    <a class="collection-icon-link" href="/collection" aria-label="Browse collection"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12.5 4.7 7a2 2 0 0 1 1.9-1.4h10.8A2 2 0 0 1 19.3 7l1.7 5.5v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M4 12h16M7 15h.01M17 15h.01"/></svg></a>
+  </div>
+</header>
 
   <main>
     <section class="luxury-hero">
@@ -91,13 +80,10 @@
     </section>
   </main>
 
-  <footer class="site-footer" id="contact">
-    <div class="footer-main">
-      <div class="footer-brand-block"><a class="brand footer-brand" href="index.html"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-copy"><strong>PREMIER</strong><small>MOTORWORKS</small></span></a><p>Exceptional cars. A more considered experience.</p></div>
-      <div class="footer-about"><h2>Our approach</h2><p>Thoughtfully selected vehicles, clear information and a personal approach to every enquiry. Your next drive starts with a conversation.</p></div>
-      <div class="footer-links"><h2>Explore</h2><a href="#inventory">The collection</a><a href="#brands">Our brands</a><a href="saved-cars.html">Saved cars</a><a href="#top">Back to top ↑</a></div>
-    </div>
-    <div class="footer-bottom"><span>© <span id="current-year">2026</span> Premier Motorworks. All rights reserved.</span><span>Designed for the love of the drive.</span></div>
-  </footer>
+  <footer class="site-footer sule-footer" id="contact"><div class="footer-main">
+  <div class="footer-brand-block"><a class="footer-wordmark" href="/">Premier</a><div class="footer-socials"><a href="#contact" aria-label="Instagram">◎</a><a href="#contact" aria-label="Facebook">f</a><a href="#contact" aria-label="TikTok">♪</a><a href="#contact" aria-label="X">𝕏</a><a href="mailto:hello@premiermotorworks.com" aria-label="Email">✉</a></div></div>
+  <div class="footer-about"><h2>About Premier</h2><p>Exceptional cars. A more considered experience.</p></div>
+  <div class="footer-links"><h2>Quick Links</h2><a href="/">Home</a><a href="/collection">Collection</a><a href="/saved-cars.html">Saved cars</a></div>
+</div><div class="footer-bottom"><span>© <span id="current-year">2026</span> Premier Motorworks · All rights reserved</span><a href="#top">Back to top ↑</a></div></footer>
 </body>
 </html>
