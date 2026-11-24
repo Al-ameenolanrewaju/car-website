@@ -3,10 +3,12 @@ from datetime import timedelta
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///car_marketplace.db").replace("postgres://", "postgresql://", 1)
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///car_marketplace.db")
+    if SQLALCHEMY_DATABASE_URI.startswith(("postgres://", "postgresql://")):
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql+psycopg://", 1).replace("postgresql://", "postgresql+psycopg://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
-    MAX_CONTENT_LENGTH = 8 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 40 * 1024 * 1024
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "true").lower() == "true"
