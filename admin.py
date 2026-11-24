@@ -229,7 +229,15 @@ def settings():
     defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": "", "instagram_url": "", "facebook_url": "", "tiktok_url": "", "x_url": ""}
     if request.method == "POST":
         for key in defaults:
-            value = request.form.get(key, "").strip()[:255]
+            value = request.form.get(key, "").strip()[:500 if key.endswith("_url") else 255]
+            if key.endswith("_url") and value and not value.lower().startswith(("https://", "http://")):
+                flash("Social media links must start with https:// or http://.", "error")
+                values = defaults.copy()
+                for item in SiteSetting.query.all():
+                    if item.key in values:
+                        values[item.key] = item.value
+                values.update({social_key: request.form.get(social_key, "").strip() for social_key in ("instagram_url", "facebook_url", "tiktok_url", "x_url")})
+                return render_template("admin/settings.html", settings=values), 400
             item = SiteSetting.query.filter_by(key=key).first()
             if item is None:
                 item = SiteSetting(key=key, value=value)
