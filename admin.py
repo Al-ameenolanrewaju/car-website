@@ -226,7 +226,7 @@ def enquiry_status(enquiry_id):
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @admin_required
 def settings():
-    defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": ""}
+    defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": "", "instagram_url": "", "facebook_url": "", "tiktok_url": "", "x_url": ""}
     if request.method == "POST":
         for key in defaults:
             value = request.form.get(key, "").strip()[:255]
