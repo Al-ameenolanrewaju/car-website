@@ -343,21 +343,10 @@ def enquiry_status(enquiry_id):
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @admin_required
 def settings():
-    defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": "", "instagram_url": "", "facebook_url": "", "tiktok_url": "", "x_url": "", "vehicle_categories": "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car", "vehicle_brands": ""}
+    defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": "", "instagram_url": "", "facebook_url": "", "tiktok_url": "", "x_url": ""}
     if request.method == "POST":
         for key in defaults:
-            value = request.form.get(key, "").strip()[:500 if key.endswith("_url") else (2000 if key == "vehicle_categories" else 255)]
-            if key == "vehicle_categories":
-                categories = list(dict.fromkeys(line.strip()[:50] for line in value.splitlines() if line.strip()))[:50]
-                value = "\n".join(categories)
-                if not value:
-                    flash("Add at least one vehicle category.", "error")
-                    values = defaults.copy()
-                    for saved in SiteSetting.query.all():
-                        if saved.key in values:
-                            values[saved.key] = saved.value
-                    values[key] = request.form.get(key, "")
-                    return render_template("admin/settings.html", settings=values), 400
+            value = request.form.get(key, "").strip()[:500 if key.endswith("_url") else 255]
             if key.endswith("_url") and value and not value.lower().startswith(("https://", "http://")):
                 flash("Social media links must start with https:// or http://.", "error")
                 values = defaults.copy()
