@@ -31,6 +31,10 @@ def create_app(config_object=Config):
     def home():
         return send_from_directory(app.root_path, "index.html")
 
+    @app.get("/collection")
+    def collection_page():
+        return send_from_directory(app.root_path, "collection.html")
+
     @app.get("/car.html")
     def car_page():
         return send_from_directory(app.root_path, "car.html")
