@@ -163,6 +163,7 @@ def vehicle_edit(vehicle_id):
                 if raw_id.isdigit():
                     image = VehicleImage.query.filter_by(id=int(raw_id), vehicle_id=vehicle.id).first()
                     if image:
+                        vehicle.images.remove(image)
                         db.session.delete(image)
             db.session.flush()
             save_uploads(vehicle)
