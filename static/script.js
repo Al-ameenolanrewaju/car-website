@@ -12,7 +12,7 @@
     try { const r=await fetch("/api/vehicles"); if(!r.ok)throw new Error(); const d=await r.json(); cars=(d.vehicles||[]).map(safeVehicle); if(count)count.textContent=cars.length+ (cars.length===1?" vehicle":" vehicles"); if(!cars.length&&grid)grid.innerHTML='<div class="loading-note">Our collection is being updated. Please check back soon.</div>'; }
     catch (_) { if(count)count.textContent="Inventory unavailable"; if(grid)grid.innerHTML='<div class="loading-note">We could not load the collection right now. Please refresh the page.</div>'; }
     try { const t=await fetch("/api/csrf-token"); if(t.ok)csrfToken=(await t.json()).csrf_token||""; } catch (_) {}
-    try { const r=await fetch("/api/site-settings"); if(r.ok)siteSettings={...siteSettings,...await r.json()}; } catch (_) {}
+    try { const r=await fetch("/api/site-settings"); if(r.ok){siteSettings={...siteSettings,...await r.json()};document.querySelectorAll("[data-social-platform]").forEach(link=>{const url=siteSettings[link.dataset.socialPlatform]||"";if(url){link.href=url;link.target="_blank";link.rel="noopener noreferrer";link.hidden=false;}else{link.hidden=true;}});} } catch (_) {}
   }
   const readSaved = () => { try { const value=JSON.parse(localStorage.getItem(SAVED_KEY)||"[]"); return Array.isArray(value)?value.filter(id=>cars.some(car=>car.id===id)):[]; } catch (_) { return []; } };
   const writeSaved = ids => { localStorage.setItem(SAVED_KEY,JSON.stringify([...new Set(ids)])); updateSavedCounts(); };
