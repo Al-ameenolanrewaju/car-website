@@ -58,6 +58,48 @@ class MarketplaceTests(unittest.TestCase):
         self.assertEqual(Enquiry.query.count(), 1)
         self.assertEqual(Enquiry.query.first().vehicle_id, self.vehicle.id)
 
+    def test_multi_vehicle_enquiry_is_saved_as_one_lead(self):
+        second = Vehicle(
+            slug="honda-accord-2023", make="Honda", model="Accord",
+            name="Honda Accord", year=2023, price=30000000, currency="NGN",
+            mileage=18000, mileage_unit="km", transmission="Automatic",
+            fuel="Petrol", condition="used", body="Sedan",
+            status="available", published=True
+        )
+        db.session.add(second)
+        db.session.commit()
+        response = self.client.post("/api/enquiries", json={
+            "name": "Ada Customer", "email": "ada@example.test",
+            "phone": "+2348012345678", "message": "Please contact me about both cars.",
+            "vehicle_ids": ["toyota-camry-2022", "honda-accord-2023"]
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.get_json()["vehicle_count"], 2)
+        enquiry = Enquiry.query.one()
+        self.assertEqual([car.slug for car in enquiry.selected_vehicles],
+                         ["toyota-camry-2022", "honda-accord-2023"])
+        self.assertEqual(enquiry.vehicle.slug, "toyota-camry-2022")
+
+    def test_multi_vehicle_enquiry_rejects_unavailable_vehicle(self):
+        self.vehicle.status = "sold"
+        db.session.commit()
+        response = self.client.post("/api/enquiries", json={
+            "name": "Ada Customer", "email": "ada@example.test",
+            "phone": "+2348012345678", "message": "I want these cars.",
+            "vehicle_ids": ["toyota-camry-2022"]
+        })
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(Enquiry.query.count(), 0)
+
+    def test_multi_vehicle_enquiry_rejects_duplicate_vehicle_ids(self):
+        response = self.client.post("/api/enquiries", json={
+            "name": "Ada Customer", "email": "ada@example.test",
+            "phone": "+2348012345678", "message": "I want this car twice.",
+            "vehicle_ids": ["toyota-camry-2022", "toyota-camry-2022"]
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Enquiry.query.count(), 0)
+
     def test_admin_login_and_dashboard(self):
         response = self.client.post("/admin/login", data={
             "email": "admin@example.test",
