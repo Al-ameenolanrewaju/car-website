@@ -84,7 +84,7 @@ def create_app(config_object=Config):
         if admin_email and admin_password:
             existing_admin = AdminUser.query.filter_by(email=admin_email).first()
             if existing_admin is None:
-                if len(admin_password) < 12:
+                if len(admin_password) < 1:
                     raise click.ClickException("ADMIN_PASSWORD must contain at least 1 character.")
                 admin = AdminUser(email=admin_email, name="Administrator", role="admin", active=True)
                 admin.set_password(admin_password)
