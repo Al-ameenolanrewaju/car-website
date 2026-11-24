@@ -164,6 +164,7 @@ def vehicle_edit(vehicle_id):
                     image = VehicleImage.query.filter_by(id=int(raw_id), vehicle_id=vehicle.id).first()
                     if image:
                         db.session.delete(image)
+            db.session.flush()
             save_uploads(vehicle)
             record_audit("vehicle.updated", "vehicle", vehicle.slug, vehicle.name)
             db.session.commit()
