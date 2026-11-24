@@ -6,7 +6,7 @@
 <label>Make *<input name="make" required maxlength="80" value="{{ vehicle.make if vehicle else '' }}" placeholder="BMW"></label>
 <label>Model *<input name="model" required maxlength="100" value="{{ vehicle.model if vehicle else '' }}" placeholder="3 Series"></label>
 <label>Year *<input name="year" type="number" min="1886" max="2100" required value="{{ vehicle.year if vehicle else '' }}"></label>
-<label>Body type *<select name="body" required>{% for v in ['Sedan','SUV','Coupe','Hatchback','Truck','Pickup','Van','Convertible','Wagon','Sports car'] %}<option {{ 'selected' if vehicle and vehicle.body==v else '' }}>{{ v }}</option>{% endfor %}</select></label>
+<label>Body type *<select name="body" required>{% for v in vehicle_categories %}<option {{ 'selected' if vehicle and vehicle.body==v else '' }}>{{ v }}</option>{% endfor %}</select></label>
 <label>Condition *<select name="condition" required>{% for v in ['new','used'] %}<option value="{{ v }}" {{ 'selected' if vehicle and vehicle.condition==v else '' }}>{{ 'New' if v=='new' else 'Pre-owned' }}</option>{% endfor %}</select></label>
 </div></div>
 <div class="form-section"><div class="form-section-title"><h2>Pricing & specifications</h2><p>Set a clear price and technical details.</p></div><div class="form-grid">
