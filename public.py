@@ -88,5 +88,5 @@ def create_enquiry():
 @public_bp.get("/api/site-settings")
 def public_site_settings():
     from models import SiteSetting
-    values = {item.key: item.value for item in SiteSetting.query.filter(SiteSetting.key.in_(["business_name", "whatsapp_number", "currency"])).all()}
-    return jsonify({"business_name": values.get("business_name", "Premier Motorworks"), "whatsapp_number": values.get("whatsapp_number", ""), "currency": values.get("currency", "NGN")})
+    values = {item.key: item.value for item in SiteSetting.query.filter(SiteSetting.key.in_(["business_name", "whatsapp_number", "currency", "instagram_url", "facebook_url", "tiktok_url", "x_url"])).all()}
+    return jsonify({"business_name": values.get("business_name", "Premier Motorworks"), "whatsapp_number": values.get("whatsapp_number", ""), "currency": values.get("currency", "NGN"), "instagram_url": values.get("instagram_url", ""), "facebook_url": values.get("facebook_url", ""), "tiktok_url": values.get("tiktok_url", ""), "x_url": values.get("x_url", "")})
