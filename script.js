@@ -4,6 +4,7 @@
   const money = (value,currency="NGN") => { try { return new Intl.NumberFormat("en-NG",{style:"currency",currency,maximumFractionDigits:0}).format(value); } catch (_) { return String(value); } };
   let cars = [];
   let siteSettings = {business_name:"Premier Motorworks",whatsapp_number:""};
+  let csrfToken = "";
   const escapeHTML = value => String(value ?? "").replace(/[&<>\"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[c]));
   function safeVehicle(v) { const x={...v}; for (const k of ["id","slug","make","model","name","currency","mileageUnit","transmission","fuel","condition","body","engine","drive","colour","description","tag","status"]) if(x[k]!==undefined)x[k]=escapeHTML(x[k]); x.features=Array.isArray(x.features)?x.features.map(escapeHTML):[]; x.images=Array.isArray(x.images)?x.images.map(escapeHTML):[]; return x; }
   async function loadVehicles() {
@@ -62,9 +63,9 @@
     document.title=car.name+" | Premier Motorworks";
     const saved=readSaved().includes(car.id);
     root.innerHTML=`<div class="detail-gallery">
-      <div class="detail-main-image"><img id="detail-main-image" src="${car.images[0]}" alt="${car.name}" fetchpriority="high"></div>
+      <div class="detail-main-image"><img id="detail-main-image" src="${car.images[0] || "/static/car-placeholder.svg"}" alt="${car.name}" fetchpriority="high"></div>
       ${car.images.slice(0,3).map((src,index)=>`<button class="detail-thumb ${index===0?"is-active":""}" type="button" data-gallery-src="${src}" aria-label="Show vehicle image ${index+1}"><img src="${src}" alt="" loading="lazy" decoding="async"></button>`).join("")}
-    </div><section class="detail-info"><p class="eyebrow">${car.year} · ${car.condition==="new"?"Brand new":"Pre-owned"} · ${car.body}</p><h1>${car.name}</h1><p class="detail-price">${money(car.price)}</p><p class="detail-description">${car.description}</p>
+    </div><section class="detail-info"><p class="eyebrow">${car.year} · ${car.condition==="new"?"Brand new":"Pre-owned"} · ${car.body}</p><h1>${car.name}</h1><p class="detail-price">${money(car.price,car.currency)}</p><p class="detail-description">${car.description}</p>
       <div class="detail-specs">
         <div class="spec-item"><span>Year</span><strong>${car.year}</strong></div><div class="spec-item"><span>Mileage</span><strong>${car.mileage?car.mileage.toLocaleString()+" "+(car.mileageUnit||"km"):"Brand new"}</strong></div>
         <div class="spec-item"><span>Transmission</span><strong>${car.transmission}</strong></div><div class="spec-item"><span>Fuel type</span><strong>${car.fuel}</strong></div>
@@ -112,7 +113,7 @@
       const feedback=form.querySelector(".enquiry-feedback"),button=form.querySelector('button[type="submit"]'),data=new FormData(form);
       const payload={name:data.get("name"),email:data.get("email"),phone:data.get("phone"),message:data.get("message"),website:data.get("website"),vehicle_id:car.id};
       if(feedback)feedback.textContent="Sending your enquiry…"; if(button)button.disabled=true;
-      try { const token=document.querySelector('meta[name="csrf-token"]')?.content||""; const response=await fetch("/api/enquiries",{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":token},body:JSON.stringify(payload)}); const result=await response.json(); if(!response.ok)throw new Error(result.error||"Your enquiry could not be sent."); if(feedback)feedback.textContent=result.message||"Thank you. Your enquiry has been received."; form.reset(); }
+      try { const token=csrfToken; const response=await fetch("/api/enquiries",{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":token},body:JSON.stringify(payload)}); const result=await response.json(); if(!response.ok)throw new Error(result.error||"Your enquiry could not be sent."); if(feedback)feedback.textContent=result.message||"Thank you. Your enquiry has been received."; form.reset(); }
       catch(error){if(feedback)feedback.textContent=error.message||"Please try again.";} finally{if(button)button.disabled=false;}
     });
     window.addEventListener("storage",event=>{if(event.key===SAVED_KEY){updateSavedCounts();renderInventory();renderSavedPage();if(document.getElementById("car-detail-content"))renderDetail();}});
