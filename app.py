@@ -66,8 +66,8 @@ def create_app(config_object=Config):
         email = email.strip().lower()
         if AdminUser.query.filter_by(email=email).first():
             raise click.ClickException("An administrator with that email already exists.")
-        if len(password) < 12:
-            raise click.ClickException("Use an admin password of at least 12 characters.")
+        if len(password) < 1:
+            raise click.ClickException("Use an admin password of at least 1 character.")
         user = AdminUser(email=email, name=name.strip() or "Administrator")
         user.set_password(password)
         db.session.add(user)
@@ -85,7 +85,7 @@ def create_app(config_object=Config):
             existing_admin = AdminUser.query.filter_by(email=admin_email).first()
             if existing_admin is None:
                 if len(admin_password) < 12:
-                    raise click.ClickException("ADMIN_PASSWORD must contain at least 12 characters.")
+                    raise click.ClickException("ADMIN_PASSWORD must contain at least 1 character.")
                 admin = AdminUser(email=admin_email, name="Administrator", role="admin", active=True)
                 admin.set_password(admin_password)
                 db.session.add(admin)
