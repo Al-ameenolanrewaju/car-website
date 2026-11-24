@@ -14,8 +14,8 @@
 <a class="admin-brand" href="{{ url_for('admin.dashboard') }}"><span class="brand-mark">P</span><span><b>PREMIER</b><small>MOTORWORKS</small></span></a>
 <div class="sidebar-label">WORKSPACE</div>
 <nav class="side-nav">
-<a class="{{ 'active' if request.endpoint == 'admin.dashboard' else '' }}" href="{{ url_for('admin.dashboard') }}">⌂ <span>Overview</span></a>
-<a class="{{ 'active' if request.endpoint in ['admin.vehicles','admin.vehicle_new','admin.vehicle_edit'] else '' }}" href="{{ url_for('admin.vehicles') }}">▤ <span>Vehicles</span></a>
+<a class="{{ 'active' if request.endpoint == 'admin.dashboard' else '' }}" href="{{ url_for('admin.dashboard') }}">⌂ <span>Dashboard</span></a>
+<a class="{{ 'active' if request.endpoint in ['admin.vehicles','admin.vehicle_new','admin.vehicle_edit'] else '' }}" href="{{ url_for('admin.vehicles') }}">▤ <span>Vehicles</span></a><a class="{{ 'active' if request.endpoint == 'admin.categories' else '' }}" href="{{ url_for('admin.categories') }}">▦ <span>Categories</span></a><a class="{{ 'active' if request.endpoint == 'admin.brands' else '' }}" href="{{ url_for('admin.brands') }}">◇ <span>Brands / Makes</span></a>
 <a class="{{ 'active' if request.endpoint in ['admin.enquiries','admin.enquiry_status'] else '' }}" href="{{ url_for('admin.enquiries') }}">✉ <span>Enquiries</span>{% set new_count = namespace(value=0) %}{% for e in [] %}{% set new_count.value = new_count.value + 1 %}{% endfor %}</a>
 <a class="{{ 'active' if request.endpoint == 'admin.settings' else '' }}" href="{{ url_for('admin.settings') }}">⚙ <span>Settings</span></a>{% if current_user.role == 'admin' %}<a class="{{ 'active' if request.endpoint == 'admin.team' else '' }}" href="{{ url_for('admin.team') }}">♙ <span>Team access</span></a>{% endif %}
 </nav>
