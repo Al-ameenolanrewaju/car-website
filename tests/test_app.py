@@ -65,6 +65,15 @@ class MarketplaceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Toyota Camry", response.data)
 
+    def test_admin_can_create_team_account(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        response = self.client.post("/admin/team", data={"action": "create", "name": "Sales Manager", "email": "sales@example.test", "password": "a-strong-temporary-password", "role": "manager"}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        member = AdminUser.query.filter_by(email="sales@example.test").first()
+        self.assertIsNotNone(member)
+        self.assertEqual(member.role, "manager")
+        self.assertTrue(member.check_password("a-strong-temporary-password"))
+
     def test_wrong_admin_password_is_rejected(self):
         self.client.post("/admin/login", data={
             "email": "admin@example.test", "password": "wrong-password"
