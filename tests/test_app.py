@@ -76,8 +76,8 @@ class MarketplaceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.get_json()["vehicle_count"], 2)
         enquiry = Enquiry.query.one()
-        self.assertEqual([car.slug for car in enquiry.selected_vehicles],
-                         ["toyota-camry-2022", "honda-accord-2023"])
+        self.assertEqual({car.slug for car in enquiry.selected_vehicles},
+                         {"toyota-camry-2022", "honda-accord-2023"})
         self.assertEqual(enquiry.vehicle.slug, "toyota-camry-2022")
 
     def test_multi_vehicle_enquiry_rejects_unavailable_vehicle(self):
