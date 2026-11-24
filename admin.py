@@ -152,7 +152,9 @@ def vehicle_new():
             db.session.rollback()
             flash(str(error) if isinstance(error, ValueError) else "The vehicle could not be saved. Check the fields and try again.", "error")
     default_currency = SiteSetting.query.filter_by(key="currency").first()
-    return render_template("admin/vehicle_form.html", vehicle=None, default_currency=default_currency.value if default_currency else "NGN")
+    category_setting = SiteSetting.query.filter_by(key="vehicle_categories").first()
+    vehicle_categories = [line.strip() for line in (category_setting.value if category_setting else "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car").splitlines() if line.strip()]
+    return render_template("admin/vehicle_form.html", vehicle=None, default_currency=default_currency.value if default_currency else "NGN", vehicle_categories=vehicle_categories)
 
 @admin_bp.route("/vehicles/<int:vehicle_id>/edit", methods=["GET", "POST"])
 @admin_required
@@ -178,7 +180,11 @@ def vehicle_edit(vehicle_id):
             db.session.rollback()
             flash(str(error), "error")
     default_currency = SiteSetting.query.filter_by(key="currency").first()
-    return render_template("admin/vehicle_form.html", vehicle=vehicle, default_currency=default_currency.value if default_currency else "NGN")
+    category_setting = SiteSetting.query.filter_by(key="vehicle_categories").first()
+    vehicle_categories = [line.strip() for line in (category_setting.value if category_setting else "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car").splitlines() if line.strip()]
+    if vehicle.body not in vehicle_categories:
+        vehicle_categories.append(vehicle.body)
+    return render_template("admin/vehicle_form.html", vehicle=vehicle, default_currency=default_currency.value if default_currency else "NGN", vehicle_categories=vehicle_categories)
 
 @admin_bp.post("/vehicles/<int:vehicle_id>/delete")
 @admin_required
