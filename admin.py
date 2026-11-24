@@ -123,6 +123,9 @@ def save_uploads(vehicle):
         data = upload.read(8 * 1024 * 1024 + 1)
         if not data or len(data) > 8 * 1024 * 1024:
             raise ValueError("Each image must be smaller than 8 MB.")
+        signatures = {"image/jpeg": data.startswith(bytes.fromhex("ffd8ff")), "image/png": data.startswith(bytes.fromhex("89504e470d0a1a0a")), "image/webp": data.startswith(b"RIFF") and data[8:12] == b"WEBP", "image/avif": b"ftypavif" in data[:32] or b"ftypavis" in data[:32]}
+        if not signatures.get(upload.mimetype, False):
+            raise ValueError("The uploaded file content does not match its image type.")
         image = VehicleImage(vehicle=vehicle, filename=secure_filename(upload.filename)[:255] or "vehicle-image", mime_type=upload.mimetype, data=data, position=current)
         db.session.add(image)
         current += 1
@@ -156,6 +159,11 @@ def vehicle_edit(vehicle_id):
         try:
             for key, value in vehicle_values(request.form).items():
                 setattr(vehicle, key, value)
+            for raw_id in request.form.getlist("remove_images"):
+                if raw_id.isdigit():
+                    image = VehicleImage.query.filter_by(id=int(raw_id), vehicle_id=vehicle.id).first()
+                    if image:
+                        db.session.delete(image)
             save_uploads(vehicle)
             record_audit("vehicle.updated", "vehicle", vehicle.slug, vehicle.name)
             db.session.commit()
