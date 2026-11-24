@@ -77,6 +77,22 @@ def create_app(config_object=Config):
     @app.cli.command("init-db")
     def init_db():
         db.create_all()
+        # Optional first-admin bootstrap for hosted environments. The account is
+        # created once; later restarts never overwrite an existing password.
+        admin_email = app.config.get("ADMIN_EMAIL", "").strip().lower()
+        admin_password = app.config.get("ADMIN_PASSWORD", "")
+        if admin_email and admin_password:
+            existing_admin = AdminUser.query.filter_by(email=admin_email).first()
+            if existing_admin is None:
+                if len(admin_password) < 12:
+                    raise click.ClickException("ADMIN_PASSWORD must contain at least 12 characters.")
+                admin = AdminUser(email=admin_email, name="Administrator", role="admin", active=True)
+                admin.set_password(admin_password)
+                db.session.add(admin)
+                db.session.commit()
+                click.echo("Initial administrator account created from environment configuration.")
+            else:
+                click.echo("Configured administrator already exists; password was not changed.")
         click.echo("Database tables created. Use flask db migrate/upgrade for production schema changes.")
 
     @app.cli.command("seed-demo")
