@@ -246,3 +246,59 @@ def settings():
 @admin_required
 def overview_api():
     return jsonify({"vehicles": Vehicle.query.count(), "enquiries": Enquiry.query.count(), "new_enquiries": Enquiry.query.filter_by(status="new").count()})
+
+
+@admin_bp.route("/team", methods=["GET", "POST"])
+@admin_required
+def team():
+    if current_user.role != "admin":
+        abort(403)
+    if request.method == "POST":
+        action = request.form.get("action", "create")
+        if action == "create":
+            email = request.form.get("email", "").strip().lower()
+            name = request.form.get("name", "").strip()[:120]
+            password = request.form.get("password", "")
+            role = request.form.get("role", "manager")
+            if not email or len(email) > 255 or "@" not in email or not name:
+                flash("Enter a valid email address and team member name.", "error")
+            elif len(password) < 12:
+                flash("Use a temporary password with at least 12 characters.", "error")
+            elif role not in {"admin", "manager"}:
+                abort(400)
+            elif AdminUser.query.filter_by(email=email).first():
+                flash("That email address already has an account.", "error")
+            else:
+                user = AdminUser(email=email, name=name, role=role, active=True)
+                user.set_password(password)
+                db.session.add(user)
+                db.session.flush()
+                record_audit("team.member_created", "admin_user", user.id, email)
+                db.session.commit()
+                flash("Team account created. Share the temporary password securely.", "success")
+                return redirect(url_for("admin.team"))
+        elif action == "update":
+            raw_id = request.form.get("user_id", "")
+            if not raw_id.isdigit():
+                abort(400)
+            user = db.get_or_404(AdminUser, int(raw_id))
+            if user.id == current_user.id:
+                flash("You cannot change your own access from this screen.", "error")
+            else:
+                new_role = request.form.get("role", user.role)
+                active = request.form.get("active") == "on"
+                if new_role not in {"admin", "manager"}:
+                    abort(400)
+                if user.active and user.role == "admin" and (not active or new_role != "admin"):
+                    other_admins = AdminUser.query.filter_by(active=True, role="admin").filter(AdminUser.id != user.id).count()
+                    if other_admins == 0:
+                        flash("The account must keep at least one active administrator.", "error")
+                        return redirect(url_for("admin.team"))
+                user.role = new_role
+                user.active = active
+                record_audit("team.member_updated", "admin_user", user.id, "role=" + new_role + "; active=" + str(active))
+                db.session.commit()
+                flash("Team access updated.", "success")
+                return redirect(url_for("admin.team"))
+    members = AdminUser.query.order_by(AdminUser.created_at.asc()).all()
+    return render_template("admin/team.html", members=members)
