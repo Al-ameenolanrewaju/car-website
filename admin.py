@@ -266,8 +266,8 @@ def team():
             role = request.form.get("role", "manager")
             if not email or len(email) > 255 or "@" not in email or not name:
                 flash("Enter a valid email address and team member name.", "error")
-            elif len(password) < 12:
-                flash("Use a temporary password with at least 12 characters.", "error")
+            elif len(password) < 1:
+                flash("Use a temporary password with at least 1 character.", "error")
             elif role not in {"admin", "manager"}:
                 abort(400)
             elif AdminUser.query.filter_by(email=email).first():
