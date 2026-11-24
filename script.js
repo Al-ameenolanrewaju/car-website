@@ -71,6 +71,11 @@
       <div class="detail-actions"><button class="button button-gold" type="button" data-whatsapp-enquiry="${car.id}">Enquire on WhatsApp ↗</button><button class="button button-outline" type="button" data-save-car="${car.id}" aria-pressed="${saved}">${saved?"♥ Saved":"♡ Save for later"}</button></div>
       <form class="detail-enquiry" id="detail-enquiry"><h2>Ask about this vehicle</h2><p>Prepare an enquiry message to send to the seller through WhatsApp.</p><div class="enquiry-form"><input name="name" autocomplete="name" placeholder="Your name" required><input name="phone" type="tel" autocomplete="tel" placeholder="Your phone number (optional)"><textarea name="message" placeholder="What would you like to know?"></textarea><button class="button button-gold" type="submit">Prepare enquiry ↗</button></div></form>
     </section>`;
+    const related=cars.filter(item=>item.id!==car.id&&(item.make===car.make||item.body===car.body));
+    let similar=document.getElementById("similar-section");
+    if(!similar){similar=document.createElement("section");similar.className="similar-section";similar.id="similar-section";root.insertAdjacentElement("afterend",similar);}
+    similar.hidden=related.length===0;
+    similar.innerHTML=related.length?'<div class="section-heading"><div><p class="eyebrow">Keep exploring</p><h2>Similar <em>vehicles.</em></h2></div></div><div class="inventory-grid">'+related.map(cardMarkup).join("")+'</div>':"";
   }
   function sendEnquiry(car,form){
     let name="",phone="",message="";
