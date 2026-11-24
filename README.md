@@ -1,47 +1,73 @@
-# Premier Motorworks
+# Premier Motorworks — Vehicle Marketplace
 
-A responsive automotive catalogue inspired by the visual system and shopping experience of the clothing-website reference repository.
+A responsive automotive catalogue with a Flask backend and a private administration workspace. The storefront keeps the warm, dark editorial visual language from the reference design while vehicle data, enquiries, settings and uploaded photographs are managed server-side.
 
-## Current architecture
+## Stack
+- Python 3.11+ / Flask
+- Flask-SQLAlchemy + Flask-Migrate
+- PostgreSQL in production; SQLite for local development
+- Flask-Login password-hash authentication
+- Flask-WTF CSRF protection
+- Flask-Limiter for login and public enquiry rate limits
+- Vanilla JavaScript storefront
 
-This repository is a static HTML, CSS and vanilla JavaScript website. It does not currently contain a Flask/Django/Node backend, database, API, authentication, admin dashboard or server-side enquiry endpoint. The redesign preserves that architecture rather than silently introducing a replacement backend.
+## Customer website
+- Responsive homepage and vehicle catalogue
+- Database-backed inventory, search and filters
+- Dedicated vehicle detail view with gallery and specifications
+- Guest saved-car shortlist (stored in that browser)
+- Enquiry form that saves leads to the database
+- WhatsApp enquiry link uses the number configured in Admin Settings
 
-## Pages
+## Admin workspace
+Open /admin/login.
+- Overview dashboard: total, available, reserved and sold inventory; total and new enquiries
+- Secure admin sign-in and sign-out
+- Add, edit, publish/unpublish and delete vehicle listings
+- Upload multiple vehicle photographs; images are stored as database binary data, not on the web server filesystem
+- Vehicle status: available, reserved or sold
+- Featured vehicle toggle
+- Customer enquiry inbox with new/contacted/closed workflow and email/WhatsApp follow-up links
+- Business name, email, WhatsApp number, address and currency settings
+- Audit records for vehicle and settings changes
 
-- `index.html` — homepage, vehicle search, combined filters, brand shortcuts and inventory.
-- `car.html?id=<vehicle-id>` — dedicated vehicle details, three-image gallery, specifications, features and enquiry form.
-- `saved-cars.html` — saved vehicle shortlist.
+## Local setup
+1. Install Python 3.11 or newer.
+2. Create and activate a virtual environment.
+3. Install dependencies: pip install -r requirements.txt
+4. Set environment variables (see .env.example). At minimum, set a long random SECRET_KEY. For local HTTP development set COOKIE_SECURE=false.
+5. Create the database tables: flask --app app init-db
+6. Create your first administrator: flask --app app create-admin
+7. Start the development server: flask --app app run
 
-## Functionality
+Visit http://127.0.0.1:5000 and sign in at http://127.0.0.1:5000/admin/login.
 
-- Search by keyword, make, model and year.
-- Combined price, mileage, transmission, fuel, condition and body-type filters.
-- New/pre-owned condition tabs and brand shortcuts.
-- Save/remove favourites with browser `localStorage` persistence for guests.
-- Vehicle detail pages with image gallery and specification grid.
-- WhatsApp enquiry message preparation. The WhatsApp share flow opens without assuming a seller phone number; the user chooses the destination chat.
-- Responsive desktop, tablet and mobile layouts, lazy-loaded listing/gallery imagery, reduced-motion support and accessible control labels.
+The optional flask --app app seed-demo command inserts three unpublished sample listings. Review and replace these with real inventory before publishing.
 
-## Vehicle data
+## Production deployment
+Use a managed PostgreSQL database (Render Postgres, Supabase, or another PostgreSQL provider). Configure these environment variables in the hosting dashboard:
+- SECRET_KEY: long, randomly generated secret; never commit it
+- DATABASE_URL: PostgreSQL connection string
+- COOKIE_SECURE=true
+- RATELIMIT_STORAGE_URI: Redis URL for shared rate-limit state when running multiple instances (the default in-memory store is suitable only for a single instance)
+- ADMIN_EMAIL / ADMIN_PASSWORD are not needed when using the interactive create-admin command
 
-The current inventory is demonstration data defined in the `cars` array near the top of `script.js`. Replace it with verified inventory before production. Each record includes its own image URLs, price, mileage, specifications, condition, body type, description and features.
+Build command: pip install -r requirements.txt
+Start command: flask --app app init-db && gunicorn app:app
 
-## Production requirements not present in this repository
+After the first deploy, open a one-off shell and run flask --app app create-admin. Do not put a default admin password in source code or a public environment file.
 
-The following cannot be delivered securely with a static frontend alone:
+For future schema changes, initialize Flask-Migrate once with flask --app app db init, create reviewed migrations with flask --app app db migrate -m "describe change", then apply with flask --app app db upgrade. Migrations should be additive and must not drop existing customer or inventory data.
 
-- Authenticated saved cars synchronised across devices.
-- Seller/admin accounts and inventory management.
-- Database-backed vehicle records and image management.
-- Server-side enquiry storage, email delivery or seller routing.
-- Server-side validation, rate limiting and audit logs.
+## Storage and operational notes
+- Vehicle records, business settings, enquiries and uploaded image bytes live in the configured database.
+- No local upload folder or persistent web-server disk is required.
+- Guest saved cars currently use browser local storage. Cross-device saved lists require customer accounts and are not represented as a server-side account feature.
+- The demo listings are unpublished and must not be treated as real inventory.
+- Configure and verify the correct business WhatsApp number before launch.
+- Production should use HTTPS, a managed database with backups, a strong secret key, and a shared Redis rate-limit store for multiple app instances.
+- Add an email provider and operational notification policy if automatic email alerts are required; the current enquiry workflow stores and displays enquiries in Admin.
 
-Those features require a backend/API and a database. They have deliberately not been simulated as if local browser storage were a secure server.
-
-## Local preview
-
-Open `index.html` in a browser or serve this folder with any static HTTP server. Vehicle detail links use `car.html?id=<vehicle-id>`.
-
-## Validation
-
-The JavaScript file was syntax-checked after implementation. A live browser/device test and end-to-end backend integration test remain outstanding because this repository has no backend and the current connected GitHub workflow does not provide a browser preview session.
+## Tests
+Run python -m unittest discover -s tests -v.
+The test suite covers storefront responses, database inventory reads, enquiry persistence, admin authentication and unpublished listing visibility.
