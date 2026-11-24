@@ -5,7 +5,7 @@
 <div class="stat-card"><span>Available</span><strong>{{ stats.available }}</strong><small>Ready for enquiries</small><i>◉</i></div>
 <div class="stat-card"><span>Reserved</span><strong>{{ stats.reserved }}</strong><small>Currently on hold</small><i>◷</i></div>
 <div class="stat-card"><span>Sold</span><strong>{{ stats.sold }}</strong><small>Completed sales</small><i>✓</i></div>
-<div class="stat-card stat-highlight"><span>New enquiries</span><strong>{{ stats.new_enquiries }}</strong><small>{{ stats.enquiries }} total enquiries</small><i>✉</i></div>
+<div class="stat-card stat-highlight"><span>New enquiries</span><strong>{{ stats.new_enquiries }}</strong><small>{{ stats.enquiries }} total enquiries</small><i>✉</i></div><div class="stat-card"><span>Team members</span><strong>{{ stats.team }}</strong><small>Administrator accounts</small><i>♙</i></div>
 </section>
 <div class="dashboard-grid">
 <section class="panel"><div class="panel-heading"><div><p class="eyebrow">CUSTOMER RELATIONSHIPS</p><h2>Recent enquiries</h2></div><a href="{{ url_for('admin.enquiries') }}">View all →</a></div>
@@ -13,5 +13,6 @@
 <section class="panel"><div class="panel-heading"><div><p class="eyebrow">LATEST ADDITIONS</p><h2>Recently added</h2></div><a href="{{ url_for('admin.vehicles') }}">Inventory →</a></div>
 {% if latest %}<div class="latest-list">{% for car in latest %}<a href="{{ url_for('admin.vehicle_edit',vehicle_id=car.id) }}"><div class="latest-thumb">{% if car.images %}<img src="{{ car.images[0].url }}" alt="">{% else %}<span>◇</span>{% endif %}</div><div><b>{{ car.name }}</b><small>{{ car.year }} · {{ car.currency }} {{ '{:,.0f}'.format(car.price) }}</small></div><span class="status status-{{ car.status }}">{{ car.status|title }}</span></a>{% endfor %}</div>{% else %}<div class="empty-state"><span>◇</span><b>Your collection starts here</b><p>Add your first vehicle to begin building your inventory.</p></div>{% endif %}</section>
 </div>
+<section class="panel activity-panel"><div class="panel-heading"><div><p class="eyebrow">ADMINISTRATIVE HISTORY</p><h2>Recent activity</h2></div></div>{% if activity %}<div class="activity-list">{% for item in activity %}<div class="activity-item"><span class="activity-dot"></span><div><b>{{ item.action|replace('.',' ')|replace('_',' ')|title }}</b><small>{{ item.detail or item.entity_type }} · {{ item.created_at.strftime('%d %b %Y, %H:%M') }}</small></div></div>{% endfor %}</div>{% else %}<div class="empty-state"><b>No activity recorded yet</b><p>Vehicle, enquiry and settings changes will appear here.</p></div>{% endif %}</section>
 <div class="quick-actions"><a href="{{ url_for('admin.vehicle_new') }}">＋ Add vehicle</a><a href="{{ url_for('admin.enquiries') }}">✉ Review enquiries</a><a href="{{ url_for('admin.settings') }}">⚙ Business settings</a></div>
 {% endblock %}
