@@ -47,18 +47,42 @@ def create_enquiry():
     email = str(payload.get("email", "")).strip().lower()
     phone = str(payload.get("phone", "")).strip()
     message = str(payload.get("message", "")).strip()
-    slug = str(payload.get("vehicle_id", "")).strip()
-    if not name or len(name) > 120 or not email or len(email) > 255 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
+    raw_ids = payload.get("vehicle_ids", None)
+    if raw_ids is None:
+        legacy_id = str(payload.get("vehicle_id", "")).strip()
+        requested_ids = [legacy_id] if legacy_id else []
+    else:
+        if not isinstance(raw_ids, (list, tuple)) or not raw_ids or len(raw_ids) > 10:
+            return jsonify({"ok": False, "error": "Choose between 1 and 10 vehicles for a combined enquiry."}), 400
+        requested_ids = [str(value).strip() for value in raw_ids]
+        if any(not value for value in requested_ids) or len(set(requested_ids)) != len(requested_ids):
+            return jsonify({"ok": False, "error": "The vehicle selection contains an invalid or duplicate entry."}), 400
+
+    if not name or len(name) > 120 or not email or len(email) > 255 or not re.fullmatch(r"[^\\s@]+@[^\\s@]+\\.[^\\s@]+", email):
         return jsonify({"ok": False, "error": "Enter a valid name and email address."}), 400
     if not phone or len(phone) > 40 or not message or len(message) > 5000:
         return jsonify({"ok": False, "error": "Enter a phone number and a message under 5,000 characters."}), 400
-    vehicle = Vehicle.query.filter_by(slug=slug).first() if slug else None
-    if slug and not vehicle:
-        return jsonify({"ok": False, "error": "That vehicle could not be found."}), 404
-    enquiry = Enquiry(vehicle=vehicle, customer_name=name, email=email, phone=phone, message=message)
+
+    selected = []
+    if requested_ids:
+        selected = Vehicle.query.filter(
+            Vehicle.slug.in_(requested_ids),
+            Vehicle.published.is_(True),
+            Vehicle.status == "available"
+        ).all()
+        found = {item.slug for item in selected}
+        if found != set(requested_ids):
+            return jsonify({"ok": False, "error": "One or more selected vehicles are unavailable. Refresh the collection and try again."}), 409
+        selected.sort(key=lambda item: requested_ids.index(item.slug))
+
+    enquiry = Enquiry(
+        vehicle=selected[0] if selected else None,
+        selected_vehicles=selected,
+        customer_name=name, email=email, phone=phone, message=message
+    )
     db.session.add(enquiry)
     db.session.commit()
-    return jsonify({"ok": True, "message": "Your enquiry has been received. Our team will be in touch."}), 201
+    return jsonify({"ok": True, "message": "Your enquiry has been received. Our team will be in touch.", "enquiry_id": enquiry.id, "vehicle_count": len(selected)}), 201
 
 
 @public_bp.get("/api/site-settings")
