@@ -151,7 +151,8 @@ def vehicle_new():
         except (ValueError, Exception) as error:
             db.session.rollback()
             flash(str(error) if isinstance(error, ValueError) else "The vehicle could not be saved. Check the fields and try again.", "error")
-    return render_template("admin/vehicle_form.html", vehicle=None)
+    default_currency = SiteSetting.query.filter_by(key="currency").first()
+    return render_template("admin/vehicle_form.html", vehicle=None, default_currency=default_currency.value if default_currency else "NGN")
 
 @admin_bp.route("/vehicles/<int:vehicle_id>/edit", methods=["GET", "POST"])
 @admin_required
@@ -176,7 +177,8 @@ def vehicle_edit(vehicle_id):
         except ValueError as error:
             db.session.rollback()
             flash(str(error), "error")
-    return render_template("admin/vehicle_form.html", vehicle=vehicle)
+    default_currency = SiteSetting.query.filter_by(key="currency").first()
+    return render_template("admin/vehicle_form.html", vehicle=vehicle, default_currency=default_currency.value if default_currency else "NGN")
 
 @admin_bp.post("/vehicles/<int:vehicle_id>/delete")
 @admin_required
