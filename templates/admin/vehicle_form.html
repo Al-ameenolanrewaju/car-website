@@ -3,7 +3,7 @@
 <form class="panel vehicle-form" method="post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 <div class="form-section"><div class="form-section-title"><h2>Vehicle identity</h2><p>Basic information customers use to find the car.</p></div><div class="form-grid">
 <label>Vehicle display name *<input name="name" required maxlength="180" value="{{ vehicle.name if vehicle else '' }}" placeholder="e.g. BMW 330i M Sport"></label>
-<label>Make *<input name="make" required maxlength="80" value="{{ vehicle.make if vehicle else '' }}" placeholder="BMW"></label>
+<label>Make *<select name="make" required>{% for brand in vehicle_brands %}<option value="{{ brand }}" {{ 'selected' if vehicle and vehicle.make==brand else '' }}>{{ brand }}</option>{% endfor %}</select></label>
 <label>Model *<input name="model" required maxlength="100" value="{{ vehicle.model if vehicle else '' }}" placeholder="3 Series"></label>
 <label>Year *<input name="year" type="number" min="1886" max="2100" required value="{{ vehicle.year if vehicle else '' }}"></label>
 <label>Body type *<select name="body" required>{% for v in vehicle_categories %}<option {{ 'selected' if vehicle and vehicle.body==v else '' }}>{{ v }}</option>{% endfor %}</select></label>
