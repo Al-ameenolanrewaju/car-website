@@ -66,6 +66,24 @@ class MarketplaceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Toyota Camry", response.data)
 
+    def test_admin_can_create_and_publish_vehicle(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        response = self.client.post("/admin/vehicles/new", data={"name": "Honda Civic Sport", "make": "Honda", "model": "Civic", "year": "2023", "price": "32000000", "currency": "NGN", "mileage": "12000", "mileage_unit": "km", "transmission": "Automatic", "fuel": "Petrol", "condition": "used", "body": "Sedan", "status": "available", "published": "on"}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        created = Vehicle.query.filter_by(name="Honda Civic Sport").first()
+        self.assertIsNotNone(created)
+        self.assertTrue(created.published)
+        public_ids = [item["id"] for item in self.client.get("/api/vehicles").get_json()["vehicles"]]
+        self.assertIn(created.slug, public_ids)
+
+    def test_admin_can_save_business_settings(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        response = self.client.post("/admin/settings", data={"business_name": "Example Motors", "contact_email": "sales@example.test", "whatsapp_number": "2348012345678", "currency": "NGN", "address": "Lagos, Nigeria"}, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        settings = self.client.get("/api/site-settings").get_json()
+        self.assertEqual(settings["business_name"], "Example Motors")
+        self.assertEqual(settings["whatsapp_number"], "2348012345678")
+
     def test_admin_can_create_team_account(self):
         self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
         response = self.client.post("/admin/team", data={"action": "create", "name": "Sales Manager", "email": "sales@example.test", "password": "a-strong-temporary-password", "role": "manager"}, follow_redirects=True)
