@@ -36,7 +36,7 @@ Open /admin/login.
 1. Install Python 3.11 or newer.
 2. Create and activate a virtual environment.
 3. Install dependencies: pip install -r requirements.txt
-4. Set environment variables (see .env.example). At minimum, set a long random SECRET_KEY. For local HTTP development set COOKIE_SECURE=false.
+4. Copy .env.example to .env, then set a long random SECRET_KEY. Keep COOKIE_SECURE=false for local HTTP development. Flask CLI loads this file through python-dotenv.
 5. Create the database tables: flask --app app init-db
 6. Create your first administrator: flask --app app create-admin
 7. Start the development server: flask --app app run
