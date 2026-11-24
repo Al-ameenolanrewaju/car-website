@@ -5,7 +5,7 @@ from config import Config
 from extensions import db, migrate, login_manager, csrf, limiter
 
 def create_app(config_object=Config):
-    app = Flask(__name__, static_folder=".", static_url_path="/assets")
+    app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_object)
     if not app.config.get("SECRET_KEY"):
         if app.config.get("TESTING"):
@@ -37,6 +37,11 @@ def create_app(config_object=Config):
     @app.get("/saved-cars.html")
     def saved_page():
         return send_from_directory(".", "saved-cars.html")
+
+    @app.get("/api/csrf-token")
+    def csrf_token_api():
+        from flask_wtf.csrf import generate_csrf
+        return jsonify({"csrf_token": generate_csrf()})
 
     @app.get("/media/<int:image_id>")
     def vehicle_media(image_id):
