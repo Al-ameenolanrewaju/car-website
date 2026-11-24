@@ -90,7 +90,7 @@
     document.addEventListener("click",event=>{
       const save=event.target.closest("[data-save-car]");if(save){const id=save.dataset.saveCar,ids=readSaved(),next=ids.includes(id)?ids.filter(item=>item!==id):ids.concat(id);writeSaved(next);renderInventory();renderSavedPage();if(document.getElementById("car-detail-content"))renderDetail();return;}
       const thumb=event.target.closest("[data-gallery-src]");if(thumb){const main=document.getElementById("detail-main-image");if(main){main.src=thumb.dataset.gallerySrc;document.querySelectorAll("[data-gallery-src]").forEach(item=>item.classList.toggle("is-active",item===thumb));}return;}
-      const enquiry=event.target.closest("[data-whatsapp-enquiry]");if(enquiry){const car=cars.find(item=>item.id===enquiry.dataset.whatsappEnquiry);if(car)sendEnquiry(car,{get:()=>""});}
+      const enquiry=event.target.closest("[data-whatsapp-enquiry]");if(enquiry){const car=cars.find(item=>item.id===enquiry.dataset.whatsappEnquiry);if(car)sendEnquiry(car,null);}
     });
     const form=document.getElementById("detail-enquiry");if(form)form.addEventListener("submit",event=>{event.preventDefault();const car=cars.find(item=>item.id===new URLSearchParams(location.search).get("id"));if(car)sendEnquiry(car,form);});
     window.addEventListener("storage",event=>{if(event.key===SAVED_KEY){updateSavedCounts();renderInventory();renderSavedPage();if(document.getElementById("car-detail-content"))renderDetail();}});
