@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}{% block title %}Overview{% endblock %}{% block page_label %}Overview{% endblock %}{% block content %}
+<div class="page-heading"><div><p class="eyebrow">YOUR BUSINESS AT A GLANCE</p><h1>Good day, <em>{{ current_user.name.split(' ')[0] }}.</em></h1><p>Here is what is happening across your vehicle collection.</p></div><a class="primary-button" href="{{ url_for('admin.vehicle_new') }}">＋ Add a vehicle</a></div>
+<section class="stat-grid">
+<div class="stat-card"><span>Total vehicles</span><strong>{{ stats.total }}</strong><small>All inventory records</small><i>▤</i></div>
+<div class="stat-card"><span>Available</span><strong>{{ stats.available }}</strong><small>Ready for enquiries</small><i>◉</i></div>
+<div class="stat-card"><span>Reserved</span><strong>{{ stats.reserved }}</strong><small>Currently on hold</small><i>◷</i></div>
+<div class="stat-card"><span>Sold</span><strong>{{ stats.sold }}</strong><small>Completed sales</small><i>✓</i></div>
+<div class="stat-card stat-highlight"><span>New enquiries</span><strong>{{ stats.new_enquiries }}</strong><small>{{ stats.enquiries }} total enquiries</small><i>✉</i></div>
+</section>
+<div class="dashboard-grid">
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">CUSTOMER RELATIONSHIPS</p><h2>Recent enquiries</h2></div><a href="{{ url_for('admin.enquiries') }}">View all →</a></div>
+{% if recent %}<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Vehicle</th><th>Received</th><th>Status</th></tr></thead><tbody>{% for item in recent %}<tr><td><b>{{ item.customer_name }}</b><small>{{ item.email }}</small></td><td>{{ item.vehicle.name if item.vehicle else 'General enquiry' }}</td><td>{{ item.created_at.strftime('%d %b %Y') }}</td><td><span class="status status-{{ item.status }}">{{ item.status|title }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><span>✉</span><b>No enquiries yet</b><p>Customer enquiries will appear here when someone contacts you.</p></div>{% endif %}</section>
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">LATEST ADDITIONS</p><h2>Recently added</h2></div><a href="{{ url_for('admin.vehicles') }}">Inventory →</a></div>
+{% if latest %}<div class="latest-list">{% for car in latest %}<a href="{{ url_for('admin.vehicle_edit',vehicle_id=car.id) }}"><div class="latest-thumb">{% if car.images %}<img src="{{ car.images[0].url }}" alt="">{% else %}<span>◇</span>{% endif %}</div><div><b>{{ car.name }}</b><small>{{ car.year }} · {{ car.currency }} {{ '{:,.0f}'.format(car.price) }}</small></div><span class="status status-{{ car.status }}">{{ car.status|title }}</span></a>{% endfor %}</div>{% else %}<div class="empty-state"><span>◇</span><b>Your collection starts here</b><p>Add your first vehicle to begin building your inventory.</p></div>{% endif %}</section>
+</div>
+<div class="quick-actions"><a href="{{ url_for('admin.vehicle_new') }}">＋ Add vehicle</a><a href="{{ url_for('admin.enquiries') }}">✉ Review enquiries</a><a href="{{ url_for('admin.settings') }}">⚙ Business settings</a></div>
+{% endblock %}
