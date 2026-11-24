@@ -126,6 +126,39 @@ class MarketplaceTests(unittest.TestCase):
         self.assertEqual(settings["business_name"], "Example Motors")
         self.assertEqual(settings["whatsapp_number"], "2348012345678")
 
+    def test_admin_can_save_social_media_urls(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        response = self.client.post("/admin/settings", data={
+            "business_name": "Example Motors",
+            "instagram_url": "https://instagram.com/examplemotors",
+            "facebook_url": "https://facebook.com/examplemotors",
+            "tiktok_url": "https://tiktok.com/@examplemotors",
+            "x_url": "https://x.com/examplemotors",
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        settings = self.client.get("/api/site-settings").get_json()
+        self.assertEqual(settings["instagram_url"], "https://instagram.com/examplemotors")
+        self.assertEqual(settings["facebook_url"], "https://facebook.com/examplemotors")
+        self.assertEqual(settings["tiktok_url"], "https://tiktok.com/@examplemotors")
+        self.assertEqual(settings["x_url"], "https://x.com/examplemotors")
+
+    def test_admin_rejects_social_media_urls_without_http_scheme(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        response = self.client.post("/admin/settings", data={
+            "business_name": "Example Motors", "instagram_url": "javascript:alert(1)"
+        })
+        self.assertEqual(response.status_code, 400)
+        settings = self.client.get("/api/site-settings").get_json()
+        self.assertEqual(settings["instagram_url"], "")
+
+    def test_init_db_bootstraps_admin_with_any_non_empty_password(self):
+        self.app.config["ADMIN_EMAIL"] = "single-char@example.test"
+        self.app.config["ADMIN_PASSWORD"] = "x"
+        result = self.app.test_cli_runner().invoke(args=["init-db"])
+        self.assertEqual(result.exit_code, 0, result.output)
+        admin = AdminUser.query.filter_by(email="single-char@example.test").one()
+        self.assertTrue(admin.check_password("x"))
+
     def test_admin_can_create_team_account(self):
         self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
         response = self.client.post("/admin/team", data={"action": "create", "name": "Sales Manager", "email": "sales@example.test", "password": "a-strong-temporary-password", "role": "manager"}, follow_redirects=True)
