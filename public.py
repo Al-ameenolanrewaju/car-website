@@ -48,7 +48,7 @@ def create_enquiry():
     phone = str(payload.get("phone", "")).strip()
     message = str(payload.get("message", "")).strip()
     slug = str(payload.get("vehicle_id", "")).strip()
-    if not name or len(name) > 120 or not email or len(email) > 255 or not re.fullmatch(r"[^\\s@]+@[^\\s@]+\\.[^\\s@]+", email):
+    if not name or len(name) > 120 or not email or len(email) > 255 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
         return jsonify({"ok": False, "error": "Enter a valid name and email address."}), 400
     if not phone or len(phone) > 40 or not message or len(message) > 5000:
         return jsonify({"ok": False, "error": "Enter a phone number and a message under 5,000 characters."}), 400
