@@ -21,8 +21,9 @@ A responsive automotive catalogue with a Flask backend and a private administrat
 
 ## Admin workspace
 Open /admin/login.
-- Overview dashboard: total, available, reserved and sold inventory; total and new enquiries
+- Overview dashboard: total, available, reserved and sold inventory; total and new enquiries; team count and recent administrative activity
 - Secure admin sign-in and sign-out
+- Administrator-only team management: create staff accounts, assign administrator/manager roles, and activate or deactivate access; the last active administrator cannot be removed
 - Add, edit, publish/unpublish and delete vehicle listings
 - Upload multiple vehicle photographs; images are stored as database binary data, not on the web server filesystem
 - Vehicle status: available, reserved or sold
