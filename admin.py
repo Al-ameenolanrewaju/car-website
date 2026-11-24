@@ -61,7 +61,9 @@ def dashboard():
     recent = Enquiry.query.order_by(Enquiry.created_at.desc()).limit(6).all()
     latest = Vehicle.query.order_by(Vehicle.created_at.desc()).limit(5).all()
     activity = AuditLog.query.order_by(AuditLog.created_at.desc()).limit(8).all()
-    return render_template("admin/dashboard.html", stats=stats, recent=recent, latest=latest, activity=activity)
+    category_counts = db.session.query(Vehicle.body, db.func.count(Vehicle.id)).group_by(Vehicle.body).order_by(db.func.count(Vehicle.id).desc()).limit(6).all()
+    category_total = sum(count for _, count in category_counts) or 1
+    return render_template("admin/dashboard.html", stats=stats, recent=recent, latest=latest, activity=activity, category_counts=category_counts, category_total=category_total)
 
 @admin_bp.get("/vehicles")
 @admin_required
@@ -206,6 +208,115 @@ def image_delete(image_id):
     flash("Image deleted.", "success")
     return redirect(url_for("admin.vehicle_edit", vehicle_id=vehicle_id))
 
+def _setting_lines(key, fallback=""):
+    item = SiteSetting.query.filter_by(key=key).first()
+    raw = item.value if item else fallback
+    return list(dict.fromkeys(line.strip() for line in raw.splitlines() if line.strip()))
+
+def _save_setting_lines(key, values):
+    value = "\n".join(list(dict.fromkeys(v.strip() for v in values if v.strip())))
+    item = SiteSetting.query.filter_by(key=key).first()
+    if item is None:
+        db.session.add(SiteSetting(key=key, value=value))
+    else:
+        item.value = value
+
+@admin_bp.route("/categories", methods=["GET", "POST"])
+@admin_required
+def categories():
+    values = _setting_lines("vehicle_categories", "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car")
+    if request.method == "POST":
+        action = request.form.get("action", "add")
+        name = request.form.get("name", "").strip()[:50]
+        old_name = request.form.get("old_name", "").strip()[:50]
+        if action == "add":
+            if not name:
+                flash("Enter a category name.", "error")
+            elif any(v.casefold() == name.casefold() for v in values):
+                flash("That category already exists.", "error")
+            else:
+                values.append(name)
+                _save_setting_lines("vehicle_categories", values)
+                record_audit("category.created", "vehicle_category", name, name)
+                db.session.commit()
+                flash("Vehicle category added.", "success")
+                return redirect(url_for("admin.categories"))
+        elif action == "rename":
+            if old_name not in values or not name or any(v.casefold() == name.casefold() and v.casefold() != old_name.casefold() for v in values):
+                flash("Enter a valid, unique category name.", "error")
+            else:
+                values = [name if v == old_name else v for v in values]
+                Vehicle.query.filter_by(body=old_name).update({"body": name}, synchronize_session=False)
+                _save_setting_lines("vehicle_categories", values)
+                record_audit("category.renamed", "vehicle_category", name, old_name + " → " + name)
+                db.session.commit()
+                flash("Category renamed and existing vehicle listings updated.", "success")
+                return redirect(url_for("admin.categories"))
+        elif action == "delete":
+            if old_name not in values:
+                abort(404)
+            if Vehicle.query.filter_by(body=old_name).first():
+                flash("This category is used by vehicles. Rename it or reassign those vehicles before deleting it.", "error")
+            elif len(values) == 1:
+                flash("Keep at least one vehicle category.", "error")
+            else:
+                values.remove(old_name)
+                _save_setting_lines("vehicle_categories", values)
+                record_audit("category.deleted", "vehicle_category", old_name, old_name)
+                db.session.commit()
+                flash("Vehicle category deleted.", "success")
+                return redirect(url_for("admin.categories"))
+    counts = {name: Vehicle.query.filter_by(body=name).count() for name in values}
+    return render_template("admin/categories.html", categories=values, counts=counts)
+
+@admin_bp.route("/brands", methods=["GET", "POST"])
+@admin_required
+def brands():
+    values = _setting_lines("vehicle_brands")
+    existing = [row[0] for row in db.session.query(Vehicle.make).distinct().order_by(Vehicle.make.asc()).all() if row[0]]
+    values = list(dict.fromkeys(values + existing))
+    if request.method == "POST":
+        action = request.form.get("action", "add")
+        name = request.form.get("name", "").strip()[:80]
+        old_name = request.form.get("old_name", "").strip()[:80]
+        if action == "add":
+            if not name:
+                flash("Enter a brand or make name.", "error")
+            elif any(v.casefold() == name.casefold() for v in values):
+                flash("That brand or make already exists.", "error")
+            else:
+                values.append(name)
+                _save_setting_lines("vehicle_brands", values)
+                record_audit("brand.created", "vehicle_brand", name, name)
+                db.session.commit()
+                flash("Brand or make added.", "success")
+                return redirect(url_for("admin.brands"))
+        elif action == "rename":
+            if old_name not in values or not name or any(v.casefold() == name.casefold() and v.casefold() != old_name.casefold() for v in values):
+                flash("Enter a valid, unique brand name.", "error")
+            else:
+                values = [name if v == old_name else v for v in values]
+                Vehicle.query.filter_by(make=old_name).update({"make": name}, synchronize_session=False)
+                _save_setting_lines("vehicle_brands", values)
+                record_audit("brand.renamed", "vehicle_brand", name, old_name + " → " + name)
+                db.session.commit()
+                flash("Brand renamed and existing vehicle listings updated.", "success")
+                return redirect(url_for("admin.brands"))
+        elif action == "delete":
+            if old_name not in values:
+                abort(404)
+            if Vehicle.query.filter_by(make=old_name).first():
+                flash("This brand is used by vehicle listings. Rename or reassign those vehicles before deleting it.", "error")
+            else:
+                values.remove(old_name)
+                _save_setting_lines("vehicle_brands", values)
+                record_audit("brand.deleted", "vehicle_brand", old_name, old_name)
+                db.session.commit()
+                flash("Brand or make deleted.", "success")
+                return redirect(url_for("admin.brands"))
+    counts = {name: Vehicle.query.filter_by(make=name).count() for name in values}
+    return render_template("admin/brands.html", brands=values, counts=counts)
+
 @admin_bp.get("/enquiries")
 @admin_required
 def enquiries():
@@ -232,13 +343,13 @@ def enquiry_status(enquiry_id):
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @admin_required
 def settings():
-    defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": "", "instagram_url": "", "facebook_url": "", "tiktok_url": "", "x_url": "", "vehicle_categories": "Sedan\\nSUV\\nCoupe\\nHatchback\\nTruck\\nPickup\\nVan\\nConvertible\\nWagon\\nSports car"}
+    defaults = {"business_name": "Premier Motorworks", "contact_email": "", "whatsapp_number": "", "currency": "NGN", "address": "", "instagram_url": "", "facebook_url": "", "tiktok_url": "", "x_url": "", "vehicle_categories": "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car", "vehicle_brands": ""}
     if request.method == "POST":
         for key in defaults:
             value = request.form.get(key, "").strip()[:500 if key.endswith("_url") else (2000 if key == "vehicle_categories" else 255)]
             if key == "vehicle_categories":
                 categories = list(dict.fromkeys(line.strip()[:50] for line in value.splitlines() if line.strip()))[:50]
-                value = "\\n".join(categories)
+                value = "\n".join(categories)
                 if not value:
                     flash("Add at least one vehicle category.", "error")
                     values = defaults.copy()
