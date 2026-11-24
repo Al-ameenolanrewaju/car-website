@@ -1,10 +1,21 @@
 from flask import Blueprint, current_app, jsonify, request, abort
-from sqlalchemy import or_
+from sqlalchemy import or_, text
+from sqlalchemy.exc import SQLAlchemyError
 from extensions import db, limiter
 from models import Vehicle, VehicleImage, Enquiry
 import re
 
 public_bp = Blueprint("public", __name__)
+
+@public_bp.get("/health")
+def health():
+    """Unauthenticated health check for the app and its database."""
+    try:
+        db.session.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        db.session.rollback()
+        return jsonify({"status": "error", "database": "unavailable"}), 503
+    return jsonify({"status": "ok", "database": "ok"}), 200
 
 @public_bp.get("/api/vehicles")
 def vehicles():
