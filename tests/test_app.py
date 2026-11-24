@@ -159,6 +159,27 @@ class MarketplaceTests(unittest.TestCase):
         admin = AdminUser.query.filter_by(email="single-char@example.test").one()
         self.assertTrue(admin.check_password("x"))
 
+    def test_admin_can_manage_vehicle_categories(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        added = self.client.post("/admin/categories", data={"action": "add", "name": "Electric SUV"}, follow_redirects=True)
+        self.assertEqual(added.status_code, 200)
+        self.assertIn(b"Electric SUV", added.data)
+        renamed = self.client.post("/admin/categories", data={"action": "rename", "old_name": "Sedan", "name": "Saloon"}, follow_redirects=True)
+        self.assertEqual(renamed.status_code, 200)
+        self.assertEqual(db.session.get(Vehicle, self.vehicle.id).body, "Saloon")
+        blocked = self.client.post("/admin/categories", data={"action": "delete", "old_name": "Saloon"}, follow_redirects=True)
+        self.assertEqual(blocked.status_code, 200)
+        self.assertEqual(db.session.get(Vehicle, self.vehicle.id).body, "Saloon")
+
+    def test_admin_can_manage_vehicle_brands(self):
+        self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
+        added = self.client.post("/admin/brands", data={"action": "add", "name": "Lexus"}, follow_redirects=True)
+        self.assertEqual(added.status_code, 200)
+        self.assertIn(b"Lexus", added.data)
+        renamed = self.client.post("/admin/brands", data={"action": "rename", "old_name": "Toyota", "name": "Toyota Motor"}, follow_redirects=True)
+        self.assertEqual(renamed.status_code, 200)
+        self.assertEqual(db.session.get(Vehicle, self.vehicle.id).make, "Toyota Motor")
+
     def test_admin_can_create_team_account(self):
         self.client.post("/admin/login", data={"email": "admin@example.test", "password": "correct-horse-battery-staple"})
         response = self.client.post("/admin/team", data={"action": "create", "name": "Sales Manager", "email": "sales@example.test", "password": "a-strong-temporary-password", "role": "manager"}, follow_redirects=True)
