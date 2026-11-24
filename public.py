@@ -58,7 +58,7 @@ def create_enquiry():
         if any(not value for value in requested_ids) or len(set(requested_ids)) != len(requested_ids):
             return jsonify({"ok": False, "error": "The vehicle selection contains an invalid or duplicate entry."}), 400
 
-    if not name or len(name) > 120 or not email or len(email) > 255 or not re.fullmatch(r"[^\\s@]+@[^\\s@]+\\.[^\\s@]+", email):
+    if not name or len(name) > 120 or not email or len(email) > 255 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
         return jsonify({"ok": False, "error": "Enter a valid name and email address."}), 400
     if not phone or len(phone) > 40 or not message or len(message) > 5000:
         return jsonify({"ok": False, "error": "Enter a phone number and a message under 5,000 characters."}), 400
