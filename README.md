@@ -17,6 +17,7 @@ A responsive automotive catalogue with a Flask backend and a private administrat
 - Dedicated vehicle detail view with gallery and specifications
 - Guest saved-car shortlist (stored in that browser)
 - Enquiry form that saves leads to the database
+- Multi-vehicle enquiry submissions: one customer lead can include up to 10 available vehicles, with selected vehicles visible in the admin inbox
 - WhatsApp enquiry link uses the number configured in Admin Settings
 
 ## Admin workspace
