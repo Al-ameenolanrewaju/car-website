@@ -7,6 +7,7 @@ from extensions import db, migrate, login_manager, csrf, limiter
 def create_app(config_object=Config):
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config_object)
+    os.makedirs(app.instance_path, exist_ok=True)
     if not app.config.get("SECRET_KEY"):
         if app.config.get("TESTING"):
             app.config["SECRET_KEY"] = "test-only-secret"
@@ -28,15 +29,15 @@ def create_app(config_object=Config):
 
     @app.get("/")
     def home():
-        return send_from_directory(".", "index.html")
+        return send_from_directory(app.root_path, "index.html")
 
     @app.get("/car.html")
     def car_page():
-        return send_from_directory(".", "car.html")
+        return send_from_directory(app.root_path, "car.html")
 
     @app.get("/saved-cars.html")
     def saved_page():
-        return send_from_directory(".", "saved-cars.html")
+        return send_from_directory(app.root_path, "saved-cars.html")
 
     @app.get("/api/csrf-token")
     def csrf_token_api():
