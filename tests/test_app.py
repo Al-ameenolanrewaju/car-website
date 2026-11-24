@@ -43,6 +43,7 @@ class MarketplaceTests(unittest.TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"/static/script.js", response.data)
+        response.close()
         data = self.client.get("/api/vehicles").get_json()
         self.assertEqual(len(data["vehicles"]), 1)
         self.assertEqual(data["vehicles"][0]["id"], "toyota-camry-2022")
