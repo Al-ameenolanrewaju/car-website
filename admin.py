@@ -156,7 +156,7 @@ def vehicle_new():
     default_currency = SiteSetting.query.filter_by(key="currency").first()
     category_setting = SiteSetting.query.filter_by(key="vehicle_categories").first()
     vehicle_categories = [line.strip() for line in (category_setting.value if category_setting else "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car").splitlines() if line.strip()]
-    return render_template("admin/vehicle_form.html", vehicle=None, default_currency=default_currency.value if default_currency else "NGN", vehicle_categories=vehicle_categories)
+    return render_template("admin/vehicle_form.html", vehicle=None, default_currency=default_currency.value if default_currency else "NGN", vehicle_categories=vehicle_categories, vehicle_brands=_setting_lines("vehicle_brands"))
 
 @admin_bp.route("/vehicles/<int:vehicle_id>/edit", methods=["GET", "POST"])
 @admin_required
@@ -186,7 +186,7 @@ def vehicle_edit(vehicle_id):
     vehicle_categories = [line.strip() for line in (category_setting.value if category_setting else "Sedan\nSUV\nCoupe\nHatchback\nTruck\nPickup\nVan\nConvertible\nWagon\nSports car").splitlines() if line.strip()]
     if vehicle.body not in vehicle_categories:
         vehicle_categories.append(vehicle.body)
-    return render_template("admin/vehicle_form.html", vehicle=vehicle, default_currency=default_currency.value if default_currency else "NGN", vehicle_categories=vehicle_categories)
+    return render_template("admin/vehicle_form.html", vehicle=vehicle, default_currency=default_currency.value if default_currency else "NGN", vehicle_categories=vehicle_categories, vehicle_brands=list(dict.fromkeys(_setting_lines("vehicle_brands") + [row[0] for row in db.session.query(Vehicle.make).distinct().all() if row[0]])))
 
 @admin_bp.post("/vehicles/<int:vehicle_id>/delete")
 @admin_required
