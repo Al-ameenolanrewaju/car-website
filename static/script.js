@@ -3,7 +3,7 @@
   const SAVED_KEY = "premier_saved_cars_v1";
   const money = (value,currency="NGN") => { try { return new Intl.NumberFormat("en-NG",{style:"currency",currency,maximumFractionDigits:0}).format(value); } catch (_) { return String(value); } };
   let cars = [];
-  let siteSettings = {business_name:"Premier Motorworks",whatsapp_number:""};
+  let siteSettings = {business_name:"Premier Motorworks",whatsapp_number:"",vehicle_categories:["Sedan","SUV","Coupe","Hatchback","Truck","Pickup","Van","Convertible","Wagon","Sports car"]};
   let csrfToken = "";
   const escapeHTML = value => String(value ?? "").replace(/[&<>\"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[c]));
   function safeVehicle(v) { const x={...v}; for (const k of ["id","slug","make","model","name","currency","mileageUnit","transmission","fuel","condition","body","engine","drive","colour","description","tag","status"]) if(x[k]!==undefined)x[k]=escapeHTML(x[k]); x.features=Array.isArray(x.features)?x.features.map(escapeHTML):[]; x.images=Array.isArray(x.images)?x.images.map(escapeHTML):[]; return x; }
@@ -12,8 +12,9 @@
     try { const r=await fetch("/api/vehicles"); if(!r.ok)throw new Error(); const d=await r.json(); cars=(d.vehicles||[]).map(safeVehicle); if(count)count.textContent=cars.length+ (cars.length===1?" vehicle":" vehicles"); if(!cars.length&&grid)grid.innerHTML='<div class="loading-note">Our collection is being updated. Please check back soon.</div>'; }
     catch (_) { if(count)count.textContent="Inventory unavailable"; if(grid)grid.innerHTML='<div class="loading-note">We could not load the collection right now. Please refresh the page.</div>'; }
     try { const t=await fetch("/api/csrf-token"); if(t.ok)csrfToken=(await t.json()).csrf_token||""; } catch (_) {}
-    try { const r=await fetch("/api/site-settings"); if(r.ok){siteSettings={...siteSettings,...await r.json()};document.querySelectorAll("[data-social-platform]").forEach(link=>{const url=siteSettings[link.dataset.socialPlatform]||"";if(url){link.href=url;link.target="_blank";link.rel="noopener noreferrer";link.hidden=false;}else{link.hidden=true;}});} } catch (_) {}
+    try { const r=await fetch("/api/site-settings"); if(r.ok){siteSettings={...siteSettings,...await r.json()};populateCategoryFilter();document.querySelectorAll("[data-social-platform]").forEach(link=>{const url=siteSettings[link.dataset.socialPlatform]||"";if(url){link.href=url;link.target="_blank";link.rel="noopener noreferrer";link.hidden=false;}else{link.hidden=true;}});} } catch (_) {}
   }
+  function populateCategoryFilter(){const select=document.getElementById("body-filter");if(!select)return;const current=select.value;const categories=Array.isArray(siteSettings.vehicle_categories)?siteSettings.vehicle_categories:[];select.innerHTML='<option value="">All categories</option>'+categories.map(value=>'<option value="'+escapeHTML(value)+'">'+escapeHTML(value)+'</option>').join("");if(categories.includes(current))select.value=current;}
   const readSaved = () => { try { const value=JSON.parse(localStorage.getItem(SAVED_KEY)||"[]"); return Array.isArray(value)?value.filter(id=>cars.some(car=>car.id===id)):[]; } catch (_) { return []; } };
   const writeSaved = ids => { localStorage.setItem(SAVED_KEY,JSON.stringify([...new Set(ids)])); updateSavedCounts(); };
   function updateSavedCounts(){ const count=readSaved().length; document.querySelectorAll("[data-saved-count]").forEach(el=>el.textContent=count); }
