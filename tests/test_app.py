@@ -1,5 +1,7 @@
 import os
 import unittest
+from unittest.mock import patch
+from sqlalchemy.exc import SQLAlchemyError
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-car-marketplace")
 from app import create_app
 from extensions import db
@@ -38,6 +40,17 @@ class MarketplaceTests(unittest.TestCase):
         db.session.remove()
         db.drop_all()
         self.ctx.pop()
+
+    def test_health_endpoint_checks_database(self):
+        response = self.client.get("/health")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"status": "ok", "database": "ok"})
+
+    def test_health_endpoint_returns_503_when_database_check_fails(self):
+        with patch("public.db.session.execute", side_effect=SQLAlchemyError("database unavailable")):
+            response = self.client.get("/health")
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.get_json(), {"status": "error", "database": "unavailable"})
 
     def test_storefront_and_public_inventory(self):
         response = self.client.get("/")
