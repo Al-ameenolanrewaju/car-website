@@ -73,8 +73,9 @@
     </section>`;
   }
   function sendEnquiry(car,form){
-    const data=new FormData(form),name=String(data.get("name")||"").trim(),phone=String(data.get("phone")||"").trim(),message=String(data.get("message")||"").trim();
-    const body=[`Hello Premier Motorworks, I'm interested in the ${car.year} ${car.name} (${money(car.price)}).`,name?`Name: ${name}`:"",phone?`Phone: ${phone}`:"",message?`Message: ${message}`:"Please share availability and viewing details."].filter(Boolean).join("\n");
+    let name="",phone="",message="";
+    if(form){const data=new FormData(form);name=String(data.get("name")||"").trim();phone=String(data.get("phone")||"").trim();message=String(data.get("message")||"").trim();}
+    const body=[`Hello Premier Motorworks, I'm interested in the ${car.year} ${car.name} (${money(car.price)}).`,name?`Name: ${name}`:"",phone?`Phone: ${phone}`:"",message?`Message: ${message}`:"Please share availability and viewing details."].filter(Boolean).join("\\n");
     window.open("https://wa.me/?text="+encodeURIComponent(body),"_blank","noopener,noreferrer");
   }
   document.addEventListener("DOMContentLoaded",()=>{
