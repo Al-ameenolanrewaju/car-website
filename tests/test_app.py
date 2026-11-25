@@ -216,9 +216,9 @@ class MarketplaceTests(unittest.TestCase):
 
     def test_seed_demo_adds_50_vehicles_with_three_photos_each_idempotently(self):
         photos = [
-            (b"demo-front", "image/jpeg", "front-demo.jpg", "front view"),
-            (b"demo-side", "image/jpeg", "side-demo.jpg", "side view"),
-            (b"demo-rear", "image/jpeg", "rear-demo.jpg", "rear view"),
+            (b"demo-front", "image/jpeg", "front-demo.jpg", "front view", "Front photo credit"),
+            (b"demo-side", "image/jpeg", "side-demo.jpg", "side view", "Side photo credit"),
+            (b"demo-rear", "image/jpeg", "rear-demo.jpg", "rear view", "Rear photo credit"),
         ]
         with patch("demo_inventory._commons_images", return_value=photos):
             result = self.app.test_cli_runner().invoke(args=["seed-demo"])
