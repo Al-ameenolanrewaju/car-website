@@ -66,3 +66,111 @@ body{background:var(--paper);color:#211b17;font-family:var(--sans)}
 .footer-socials a svg .icon-fill{fill:currentColor;stroke:none}
 .footer-socials a:hover{background:#f7f2e9;color:#2b190f;border-color:#f7f2e9}
 .footer-socials a:focus-visible{outline:2px solid #f7f2e9;outline-offset:4px}
+
+
+/* Rounded, warm button system — aligned with the mobile storefront reference */
+:root{--action-brown:#2b180f;--action-beige:#e9dfd2;--action-beige-hover:#ded0bf;--action-border:#dfd3c5}
+.marketplace-page .button,
+.marketplace-page .search-submit,
+.marketplace-page .collection-filter-panel .clear-filters{
+  min-height:54px;
+  padding:0 24px;
+  border-radius:14px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.marketplace-page .button:active,
+.marketplace-page .search-submit:active{transform:scale(.985)}
+.marketplace-page .button-gold,
+.marketplace-page .search-submit{
+  border:1px solid var(--action-beige);
+  background:var(--action-beige);
+  color:#fff;
+  box-shadow:none;
+}
+.marketplace-page .button-gold:hover,
+.marketplace-page .search-submit:hover{
+  border-color:var(--action-beige-hover);
+  background:var(--action-beige-hover);
+  color:#fff;
+}
+.marketplace-page .button-outline{
+  border:1px solid var(--action-border);
+  background:transparent;
+  color:var(--action-brown);
+}
+.marketplace-page .button-outline:hover{
+  border-color:var(--action-brown);
+  background:#f4eee7;
+  color:var(--action-brown);
+}
+.marketplace-page .condition-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px;border:0}
+.marketplace-page .condition-tabs button{
+  min-height:48px;
+  padding:0 22px;
+  border:1px solid transparent;
+  border-radius:14px;
+  background:var(--action-beige);
+  color:#776d64;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transition:background-color .18s ease,color .18s ease,transform .18s ease;
+}
+.marketplace-page .condition-tabs button:hover{background:#e2d5c7;color:var(--action-brown)}
+.marketplace-page .condition-tabs button.is-active{
+  border-color:var(--action-brown);
+  background:var(--action-brown);
+  color:#fff;
+}
+.marketplace-page .car-open{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 18px;
+  border:1px solid var(--action-beige);
+  border-radius:12px;
+  background:var(--action-beige);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-decoration:none;
+  transition:background-color .18s ease,border-color .18s ease,transform .18s ease;
+}
+.marketplace-page .car-open:hover{
+  border-color:var(--action-beige-hover);
+  background:var(--action-beige-hover);
+  color:#fff;
+  transform:translateY(-1px);
+}
+.marketplace-page .favorite{
+  width:44px;height:44px;
+  border:0;border-radius:50%;
+  background:#fff;color:var(--action-brown);
+  box-shadow:0 3px 12px #24150e18;
+}
+.marketplace-page .favorite:hover,
+.marketplace-page .favorite.is-saved{
+  background:var(--action-brown);color:#fff;
+}
+.marketplace-page .detail-actions .button{min-height:58px;border-radius:14px}
+.marketplace-page .collection-filter-panel .clear-filters{
+  border:1px solid var(--action-border);
+  background:#fbfaf7;
+  color:#51443a;
+}
+.marketplace-page .collection-filter-panel .clear-filters:hover{border-color:var(--action-brown);background:#f4eee7}
+@media(max-width:760px){
+  .marketplace-page .condition-tabs{gap:8px}
+  .marketplace-page .condition-tabs button{flex:1;min-width:0;padding:0 10px;font-size:10px}
+  .marketplace-page .car-bottom{gap:10px}
+  .marketplace-page .car-open{width:100%;min-height:46px}
+  .marketplace-page .hero-actions .button{min-height:58px;border-radius:14px}
+}
