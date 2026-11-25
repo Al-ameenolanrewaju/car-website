@@ -95,7 +95,6 @@ def create_app(config_object=Config):
                 click.echo("Configured administrator already exists; password was not changed.")
         click.echo("Database tables created. Use flask db migrate/upgrade for production schema changes.")
 
-
     @app.context_processor
     def inject_globals():
         from flask_wtf.csrf import generate_csrf
