@@ -45,8 +45,6 @@ Open /admin/login.
 Visit http://127.0.0.1:5000 and sign in at http://127.0.0.1:5000/admin/login.
 
 
-
-
 ## Production deployment
 Use a managed PostgreSQL database (Render Postgres, Supabase, or another PostgreSQL provider). Configure these environment variables in the hosting dashboard:
 - SECRET_KEY: long, randomly generated secret; never commit it
