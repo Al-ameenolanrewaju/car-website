@@ -27,6 +27,11 @@ def create_app(config_object=Config):
     app.register_blueprint(public_bp)
     app.register_blueprint(admin_bp)
 
+    @app.get("/health")
+    def health():
+        db.session.execute(db.text("SELECT 1"))
+        return {"status": "ok", "database": "ok"}
+
     @app.get("/")
     def home():
         return send_from_directory(app.root_path, "index.html")
