@@ -168,7 +168,7 @@ class MarketplaceTests(unittest.TestCase):
         self.app.config["ADMIN_EMAIL"] = "single-char@example.test"
         self.app.config["ADMIN_PASSWORD"] = "x"
         result = self.app.test_cli_runner().invoke(args=["init-db"])
-        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(result.exit_code, 0, f"{result.output} {result.exception!r}")
         admin = AdminUser.query.filter_by(email="single-char@example.test").one()
         self.assertTrue(admin.check_password("x"))
 
