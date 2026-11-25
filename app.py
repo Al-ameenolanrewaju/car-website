@@ -95,15 +95,6 @@ def create_app(config_object=Config):
                 click.echo("Configured administrator already exists; password was not changed.")
         click.echo("Database tables created. Use flask db migrate/upgrade for production schema changes.")
 
-    @app.cli.command("seed-demo")
-    def seed_demo():
-        from demo_inventory import add_demo_inventory
-        try:
-            added, images = add_demo_inventory()
-        except RuntimeError as exc:
-            raise click.ClickException(str(exc))
-        click.echo(f"Added {added} demo vehicles and {images} vehicle photos.")
-        click.echo("Demo listings are published and clearly marked as illustrative. Existing inventory was not changed.")
 
     @app.context_processor
     def inject_globals():
