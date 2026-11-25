@@ -46,6 +46,11 @@ Visit http://127.0.0.1:5000 and sign in at http://127.0.0.1:5000/admin/login.
 
 The optional flask --app app seed-demo command inserts three unpublished sample listings. Review and replace these with real inventory before publishing.
 
+
+## Demo vehicle catalogue
+
+Run `flask --app app seed-demo` to add up to 50 clearly labelled sample vehicles with three distinct Wikimedia Commons photographs per vehicle (front, side and rear search angles). The command stores image bytes in the configured database, records photo attribution and licence details, and skips existing records so current inventory is preserved. It requires outbound internet access. Demo listings are published for catalogue preview and are illustrative, not real stock. Run it manually after deployment when you want the sample cars to appear; deployment alone does not populate the database.
+
 ## Production deployment
 Use a managed PostgreSQL database (Render Postgres, Supabase, or another PostgreSQL provider). Configure these environment variables in the hosting dashboard:
 - SECRET_KEY: long, randomly generated secret; never commit it
