@@ -213,6 +213,5 @@ class MarketplaceTests(unittest.TestCase):
         db.session.commit()
         self.assertEqual(self.client.get("/api/vehicles").get_json()["vehicles"], [])
 
-
 if __name__ == "__main__":
     unittest.main()
