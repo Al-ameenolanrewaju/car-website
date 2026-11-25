@@ -7,7 +7,10 @@ class Config:
     if SQLALCHEMY_DATABASE_URI.startswith(("postgres://", "postgresql://")):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql+psycopg://", 1).replace("postgresql://", "postgresql+psycopg://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        **({"connect_args": {"options": "-csearch_path=cars"}} if SQLALCHEMY_DATABASE_URI.startswith(("postgresql://", "postgresql+psycopg://")) else {}),
+    }
     MAX_CONTENT_LENGTH = 40 * 1024 * 1024
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
