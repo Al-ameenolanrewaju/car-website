@@ -6,6 +6,7 @@ import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from extensions import db
 from models import Vehicle, VehicleImage
 
 DISPLAY_MAKES = {"bmw": "BMW", "mercedes-benz": "Mercedes-Benz", "range rover": "Range Rover", "lexus": "Lexus", "audi": "Audi", "kia": "Kia"}
