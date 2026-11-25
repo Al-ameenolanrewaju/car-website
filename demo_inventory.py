@@ -1,11 +1,14 @@
 """Idempotent demo inventory with openly licensed vehicle photography from Wikimedia Commons."""
 import json
 import re
+from html import unescape
 import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from models import Vehicle, VehicleImage
+
+DISPLAY_MAKES = {"bmw": "BMW", "mercedes-benz": "Mercedes-Benz", "range rover": "Range Rover", "lexus": "Lexus", "audi": "Audi", "kia": "Kia"}
 
 DEMO_CARS = [
     ("toyota","Camry",2024,44500000,"Sedan","2.5L Hybrid","Pearl White",18000),
@@ -100,7 +103,12 @@ def _commons_images(make, model):
             continue
         used.add(url)
         title = re.sub(r"[^A-Za-z0-9._-]+", "-", selected.get("title", "vehicle-photo"))[-220:]
-        found.append((data, mime, title, angle))
+        metadata = info.get("extmetadata", {})
+        artist = re.sub(r"<[^>]+>", "", unescape(metadata.get("Artist", {}).get("value", "Unknown author"))).strip()
+        license_name = metadata.get("LicenseShortName", {}).get("value", "license not stated")
+        license_url = metadata.get("LicenseUrl", {}).get("value", "")
+        credit = f"{title} — {artist}, {license_name} {license_url}".strip()
+        found.append((data, mime, title, angle, credit))
         time.sleep(0.15)
     if len(found) != 3:
         raise RuntimeError(
@@ -118,20 +126,22 @@ def add_demo_inventory():
         if Vehicle.query.filter_by(slug=slug).first():
             continue
         photos = _commons_images(make, model)
+        display_make = DISPLAY_MAKES.get(make.lower(), make.title())
+        credits = "\\n".join(f"Photo {index + 1}: {photo[4]}" for index, photo in enumerate(photos))
         vehicle = Vehicle(
-            slug=slug, make=make.title(), model=model,
-            name=f"{make.title()} {model}", year=year, price=price,
+            slug=slug, make=display_make, model=model,
+            name=f"{display_make} {model}", year=year, price=price,
             currency="NGN", mileage=mileage, mileage_unit="km",
             transmission="Automatic", fuel="Petrol", condition="used",
             body=body, engine=engine, drive="All-wheel drive" if body == "SUV" else "Front-wheel drive",
             colour=colour,
-            description="DEMO LISTING — Sample vehicle added for catalogue preview only. Specifications, price and availability are illustrative, not a real offer.",
+            description="DEMO LISTING — Sample vehicle added for catalogue preview only. Specifications, price and availability are illustrative, not a real offer.\\n\\nPHOTO CREDITS (Wikimedia Commons):\\n" + credits,
             features_json=json.dumps(["Demo listing", "Illustrative specifications", "Sample catalogue vehicle"]),
             status="available", featured=False, published=True
         )
         db.session.add(vehicle)
         db.session.flush()
-        for position, (data, mime, filename, angle) in enumerate(photos):
+        for position, (data, mime, filename, angle, credit) in enumerate(photos):
             db.session.add(VehicleImage(
                 vehicle_id=vehicle.id, filename=f"{angle.replace(' ', '-')}-{filename}",
                 mime_type=mime, data=data, position=position
