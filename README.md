@@ -44,12 +44,8 @@ Open /admin/login.
 
 Visit http://127.0.0.1:5000 and sign in at http://127.0.0.1:5000/admin/login.
 
-The optional flask --app app seed-demo command inserts three unpublished sample listings. Review and replace these with real inventory before publishing.
 
 
-## Demo vehicle catalogue
-
-Run `flask --app app seed-demo` to add up to 50 clearly labelled sample vehicles with three distinct Wikimedia Commons photographs per vehicle (front, side and rear search angles). The command stores image bytes in the configured database, records photo attribution and licence details, and skips existing records so current inventory is preserved. It requires outbound internet access. Demo listings are published for catalogue preview and are illustrative, not real stock. Run it manually after deployment when you want the sample cars to appear; deployment alone does not populate the database.
 
 ## Production deployment
 Use a managed PostgreSQL database (Render Postgres, Supabase, or another PostgreSQL provider). Configure these environment variables in the hosting dashboard:
@@ -70,7 +66,6 @@ For future schema changes, initialize Flask-Migrate once with flask --app app db
 - Vehicle records, business settings, enquiries and uploaded image bytes live in the configured database.
 - No local upload folder or persistent web-server disk is required.
 - Guest saved cars currently use browser local storage. Cross-device saved lists require customer accounts and are not represented as a server-side account feature.
-- The demo listings are unpublished and must not be treated as real inventory.
 - Configure and verify the correct business WhatsApp number before launch.
 - Production should use HTTPS, a managed database with backups, a strong secret key, and a shared Redis rate-limit store for multiple app instances.
 - Add an email provider and operational notification policy if automatic email alerts are required; the current enquiry workflow stores and displays enquiries in Admin.
