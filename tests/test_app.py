@@ -222,7 +222,7 @@ class MarketplaceTests(unittest.TestCase):
         ]
         with patch("demo_inventory._commons_images", return_value=photos):
             result = self.app.test_cli_runner().invoke(args=["seed-demo"])
-            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertEqual(result.exit_code, 0, f"{result.output} {result.exception!r}")
             demo_vehicles = Vehicle.query.filter(Vehicle.slug.like("demo-%")).all()
             self.assertEqual(len(demo_vehicles), 50)
             self.assertEqual(VehicleImage.query.count(), 150)
