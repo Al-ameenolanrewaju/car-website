@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-car-marketplace")
 from app import create_app
 from extensions import db
-from models import AdminUser, Vehicle, Enquiry
+from models import AdminUser, Vehicle, VehicleImage, Enquiry
 
 class TestConfig:
     TESTING = True
@@ -212,6 +212,27 @@ class MarketplaceTests(unittest.TestCase):
         self.vehicle.published = False
         db.session.commit()
         self.assertEqual(self.client.get("/api/vehicles").get_json()["vehicles"], [])
+
+
+    def test_seed_demo_adds_50_vehicles_with_three_photos_each_idempotently(self):
+        photos = [
+            (b"demo-front", "image/jpeg", "front-demo.jpg", "front view"),
+            (b"demo-side", "image/jpeg", "side-demo.jpg", "side view"),
+            (b"demo-rear", "image/jpeg", "rear-demo.jpg", "rear view"),
+        ]
+        with patch("demo_inventory._commons_images", return_value=photos):
+            result = self.app.test_cli_runner().invoke(args=["seed-demo"])
+            self.assertEqual(result.exit_code, 0, result.output)
+            demo_vehicles = Vehicle.query.filter(Vehicle.slug.like("demo-%")).all()
+            self.assertEqual(len(demo_vehicles), 50)
+            self.assertEqual(VehicleImage.query.count(), 150)
+            self.assertTrue(all(vehicle.published for vehicle in demo_vehicles))
+            self.assertTrue(all(len(vehicle.images) == 3 for vehicle in demo_vehicles))
+            second = self.app.test_cli_runner().invoke(args=["seed-demo"])
+            self.assertEqual(second.exit_code, 0, second.output)
+            self.assertEqual(Vehicle.query.filter(Vehicle.slug.like("demo-%")).count(), 50)
+            self.assertEqual(VehicleImage.query.count(), 150)
+            self.assertEqual(Vehicle.query.filter_by(slug="toyota-camry-2022").count(), 1)
 
 if __name__ == "__main__":
     unittest.main()
