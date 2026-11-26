@@ -22,6 +22,8 @@ def create_app(config_object=Config):
     limiter.init_app(app)
 
     from models import AdminUser, Vehicle, VehicleImage, Enquiry, SiteSetting
+    from scripts.seed_sample_vehicles import register_seed_command
+    register_seed_command(app)
     from public import public_bp
     from admin import admin_bp
     app.register_blueprint(public_bp)
