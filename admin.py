@@ -65,6 +65,18 @@ def dashboard():
     category_total = sum(count for _, count in category_counts) or 1
     return render_template("admin/dashboard.html", stats=stats, recent=recent, latest=latest, activity=activity, category_counts=category_counts, category_total=category_total)
 
+@admin_bp.post("/vehicles/seed-samples")
+@admin_required
+def seed_sample_vehicles():
+    # Explicit admin-only POST; global Flask-WTF CSRF protection applies.
+    result = current_app.test_cli_runner().invoke(args=["seed-sample-vehicles", "--confirm"])
+    if result.exit_code == 0:
+        flash(result.output.strip() or "Sample vehicle seeding completed.", "success")
+    else:
+        current_app.logger.error("Sample vehicle seed failed: %s", result.output)
+        flash("Sample vehicles were not added. Check application logs and try again.", "error")
+    return redirect(url_for("admin.vehicles"))
+
 @admin_bp.get("/vehicles")
 @admin_required
 def vehicles():
