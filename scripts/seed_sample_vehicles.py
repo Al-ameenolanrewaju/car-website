@@ -85,8 +85,9 @@ def register_seed_command(app):
                 slug = "sample-" + str(index + 1).zfill(2) + "-" + name.lower().replace(" ", "-")
                 if slug in existing:
                     continue
-                photo_id = PHOTO_IDS[index]
-                photo, mime = _download_photo(photo_id)
+                # The last run proved the first 15 Unsplash IDs work; later
+                # IDs include a dead 404. Rotate only through verified IDs.
+                verified_photo_ids = PHOTO_IDS[:15]
                 vehicle = Vehicle(
                     slug=slug, make=spec["make"], model=spec["model"], name=name,
                     year=spec["year"], price=Decimal(spec["price"]), currency="NGN",
@@ -106,6 +107,7 @@ def register_seed_command(app):
                 # Store three distinct image files per vehicle. Same vehicle
                 # photo source is cropped differently for gallery positions.
                 for position, crop in enumerate(("entropy", "attention", "faces")):
+                    photo_id = verified_photo_ids[(index * 3 + position) % len(verified_photo_ids)]
                     url = (f"https://images.unsplash.com/{photo_id}?auto=format&fit=crop&w=1400&h=950&q=82&crop={crop}")
                     data, image_mime = _download_photo_url(url)
                     db.session.add(VehicleImage(
