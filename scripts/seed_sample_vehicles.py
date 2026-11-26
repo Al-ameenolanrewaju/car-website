@@ -117,9 +117,13 @@ def register_seed_command(app):
                 added += 1
                 db.session.flush()
             db.session.commit()
-        except Exception:
+        except Exception as error:
             db.session.rollback()
-            raise
+            current_app.logger.exception(
+                "Sample vehicle seeding failed after %s vehicles and %s images; transaction rolled back. Error: %r",
+                added, images_added, error
+            )
+            raise click.ClickException(f"Sample seeding failed: {type(error).__name__}: {error}") from error
         click.echo(f"Created {added} sample vehicles and {images_added} image records. Existing listings were left unchanged.")
 
 def _download_photo_url(url):
