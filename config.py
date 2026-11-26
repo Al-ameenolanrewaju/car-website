@@ -1,16 +1,50 @@
 import os
 from datetime import timedelta
 
+
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///car_marketplace.db")
-    if SQLALCHEMY_DATABASE_URI.startswith(("postgres://", "postgresql://")):
-        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql+psycopg://", 1).replace("postgresql://", "postgresql+psycopg://", 1)
+
+    # Never let a hosted deployment silently use an empty, instance-local SQLite
+    # database. That makes health checks pass while all application tables vanish.
+    _database_url = (os.environ.get("DATABASE_URL") or "").strip()
+    _is_render = os.environ.get("RENDER", "").lower() == "true"
+
+    if _is_render and not _database_url:
+        raise RuntimeError(
+            "DATABASE_URL is missing. Configure the Supabase PostgreSQL URL in Render."
+        )
+
+    if not _database_url:
+        # SQLite remains available for local development only.
+        SQLALCHEMY_DATABASE_URI = "sqlite:///car_marketplace.db"
+    elif _database_url.startswith("postgres://"):
+        SQLALCHEMY_DATABASE_URI = _database_url.replace(
+            "postgres://", "postgresql+psycopg://", 1
+        )
+    elif _database_url.startswith("postgresql://"):
+        SQLALCHEMY_DATABASE_URI = _database_url.replace(
+            "postgresql://", "postgresql+psycopg://", 1
+        )
+    elif _database_url.startswith("postgresql+psycopg://"):
+        SQLALCHEMY_DATABASE_URI = _database_url
+    else:
+        raise RuntimeError(
+            "DATABASE_URL must be a PostgreSQL connection URL in hosted deployments."
+        )
+
+    _uses_postgres = SQLALCHEMY_DATABASE_URI.startswith("postgresql+psycopg://")
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
-        **({"connect_args": {"options": "-csearch_path=cars"}} if SQLALCHEMY_DATABASE_URI.startswith(("postgresql://", "postgresql+psycopg://")) else {}),
+        **(
+            {"connect_args": {"options": "-csearch_path=cars"}}
+            if _uses_postgres
+            else {}
+        ),
     }
+
     MAX_CONTENT_LENGTH = 40 * 1024 * 1024
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
