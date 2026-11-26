@@ -65,16 +65,40 @@ def dashboard():
     category_total = sum(count for _, count in category_counts) or 1
     return render_template("admin/dashboard.html", stats=stats, recent=recent, latest=latest, activity=activity, category_counts=category_counts, category_total=category_total)
 
+# The image seeding job runs outside the request so Render's HTTP worker
+# timeout does not terminate a long batch of image downloads.
+import threading
+_sample_seed_lock = threading.Lock()
+_sample_seed_running = False
+
+def _run_sample_seed(app):
+    global _sample_seed_running
+    try:
+        with app.app_context():
+            result = app.test_cli_runner().invoke(args=["seed-sample-vehicles", "--confirm"])
+            if result.exit_code == 0:
+                app.logger.info("Sample vehicle seed completed: %s", result.output.strip())
+            else:
+                app.logger.error("Sample vehicle seed failed (exit %s): %s", result.exit_code, result.output)
+    except Exception:
+        app.logger.exception("Sample vehicle seed background job crashed")
+    finally:
+        with _sample_seed_lock:
+            _sample_seed_running = False
+
 @admin_bp.post("/vehicles/seed-samples")
 @admin_required
 def seed_sample_vehicles():
     # Explicit admin-only POST; global Flask-WTF CSRF protection applies.
-    result = current_app.test_cli_runner().invoke(args=["seed-sample-vehicles", "--confirm"])
-    if result.exit_code == 0:
-        flash(result.output.strip() or "Sample vehicle seeding completed.", "success")
-    else:
-        current_app.logger.error("Sample vehicle seed failed: %s", result.output)
-        flash("Sample vehicles were not added. Check application logs and try again.", "error")
+    global _sample_seed_running
+    with _sample_seed_lock:
+        if _sample_seed_running:
+            flash("Sample vehicle seeding is already running. Please wait.", "info")
+            return redirect(url_for("admin.vehicles"))
+        _sample_seed_running = True
+    app = current_app._get_current_object()
+    threading.Thread(target=_run_sample_seed, args=(app,), daemon=True, name="sample-vehicle-seed").start()
+    flash("Sample vehicle seeding has started in the background. Refresh the inventory in a few minutes.", "success")
     return redirect(url_for("admin.vehicles"))
 
 @admin_bp.get("/vehicles")
